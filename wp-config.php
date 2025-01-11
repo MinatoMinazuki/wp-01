@@ -26,6 +26,8 @@
 
 // ** MySQL 設定 - この情報はホスティング先から入手してください。 ** //
 
+var_dump($_SERVER['SERVER_NAME']);
+
 if( $_SERVER['SERVER_NAME'] === "redcastle.jp" ){
 
     /** WordPress のためのデータベース名 */
@@ -35,7 +37,7 @@ if( $_SERVER['SERVER_NAME'] === "redcastle.jp" ){
     define('DB_USER', 'root');
 
     /** MySQL データベースのパスワード */
-    define('DB_PASSWORD', 'akatsuki005');
+    define('DB_PASSWORD', 'BuNRIMa4');
 
     /** MySQL のホスト名 */
     define('DB_HOST', 'localhost');
