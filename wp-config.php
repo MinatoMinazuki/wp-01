@@ -66,6 +66,9 @@ if( $_SERVER['SERVER_NAME'] === "redcastle.jp" ){
     /** データベースの照合順序 (ほとんどの場合変更する必要はありません) */
     define('DB_COLLATE', '');
 
+    define('WP_HOME', 'http://l-redcastle.jp/');
+    define('WP_SITEURL', 'http://l-redcastle.jp/');
+
 }
 
 /**#@+
