@@ -25,23 +25,48 @@
 // を使用し、必ず UTF-8 の BOM なし (UTF-8N) で保存してください。
 
 // ** MySQL 設定 - この情報はホスティング先から入手してください。 ** //
-/** WordPress のためのデータベース名 */
-define('DB_NAME', 'wp');
 
-/** MySQL データベースのユーザー名 */
-define('DB_USER', 'root');
+if( $_SERVER['SERVER_NAME'] === "redcastle.jp" ){
 
-/** MySQL データベースのパスワード */
-define('DB_PASSWORD', 'akatsuki005');
+    /** WordPress のためのデータベース名 */
+    define('DB_NAME', 'wp');
 
-/** MySQL のホスト名 */
-define('DB_HOST', 'localhost');
+    /** MySQL データベースのユーザー名 */
+    define('DB_USER', 'root');
 
-/** データベースのテーブルを作成する際のデータベースの文字セット */
-define('DB_CHARSET', 'utf8mb4');
+    /** MySQL データベースのパスワード */
+    define('DB_PASSWORD', 'akatsuki005');
 
-/** データベースの照合順序 (ほとんどの場合変更する必要はありません) */
-define('DB_COLLATE', '');
+    /** MySQL のホスト名 */
+    define('DB_HOST', 'localhost');
+
+    /** データベースのテーブルを作成する際のデータベースの文字セット */
+    define('DB_CHARSET', 'utf8mb4');
+
+    /** データベースの照合順序 (ほとんどの場合変更する必要はありません) */
+    define('DB_COLLATE', '');
+
+} else {
+
+    /** WordPress のためのデータベース名 */
+    define('DB_NAME', 'wp');
+
+    /** MySQL データベースのユーザー名 */
+    define('DB_USER', 'root');
+
+    /** MySQL データベースのパスワード */
+    define('DB_PASSWORD', '');
+
+    /** MySQL のホスト名 */
+    define('DB_HOST', 'localhost');
+
+    /** データベースのテーブルを作成する際のデータベースの文字セット */
+    define('DB_CHARSET', 'utf8mb4');
+
+    /** データベースの照合順序 (ほとんどの場合変更する必要はありません) */
+    define('DB_COLLATE', '');
+
+}
 
 /**#@+
  * 認証用ユニークキー
@@ -87,7 +112,7 @@ define('WP_DEBUG', false);
 
 /** Absolute path to the WordPress directory. */
 if ( !defined('ABSPATH') )
-	define('ABSPATH', dirname(__FILE__) . '/');
+    define('ABSPATH', dirname(__FILE__) . '/');
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');

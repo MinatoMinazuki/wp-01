@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>○×ゲーム</title>
+</head>
+<body>
+  <table border="3">
+    <p class="turnText">マスをクリックしたらスタート！</p>
+    <tbody>
+      <tr class="firstLine">
+        <td class="firstColumn diagonalLeft"></td>
+        <td class="secondColumn"></td>
+        <td class="thirdColumn diagonalRight"></td>
+      </tr>
+      <tr class="secondLine">
+        <td class="firstColumn"></td>
+        <td class="secondColumn diagonalLeft diagonalRight"></td>
+        <td class="thirdColumn"></td>
+      </tr>
+      <tr class="thirdLine">
+        <td class="firstColumn diagonalRight"></td>
+        <td class="secondColumn"></td>
+        <td class="thirdColumn diagonalLeft"></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="judgement">
+    <p class="circlejud"></p>
+    <p class="crossjud"></p>
+  </div>
+  <div class="button_wrapper">
+    <button class="reset">RESET</button>
+  </div>
+</body>
+<style>
+
+  .turnText{
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .turnText.com{
+    color: red;
+  }
+
+  .turnText.user{
+    color: blue;
+  }
+
+  table{
+    margin: auto;
+  }
+
+  td{
+    width: 100px;
+    height: 100px;
+    position: relative;
+  }
+
+  td.circle{
+    background-image: url(img/cercle.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  td.cross{
+    background-image: url(img/cross.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  .button_wrapper{
+    text-align: center;
+  }
+
+  .reset{
+    display: none;
+    background: linear-gradient(45deg, #ffbb1e, #ff9158);
+    font-size: 20px;
+    padding: 5px 15px;
+    border-radius: 10px;
+    color: #fcfcfc;
+    box-sizing: border-box;
+    border: none;
+  }
+
+  .reset:hover{
+    background: linear-gradient(45deg, #ffe5a8, #ffc8ac);
+    cursor: pointer;
+  }
+
+  .win{
+    color: red;
+    font-size: 20px;
+  }
+
+  .lose{
+    color: blue;
+    font-size: 15px;
+  }
+
+  .judgement{
+    margin: 20px 0;
+    text-align: center;
+  }
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+  $(function(){
+
+    var order = 0;
+    var gamejud = true;
+    var turn;
+
+    function judgement() {
+
+      if(order % 2 === 0){
+        turn = "circle";
+      } else {
+        turn = "cross";
+      }
+
+      var firstLine = $("tbody").find(".firstLine").find("."+turn+"").length;
+      var secondLine = $("tbody").find(".secondLine").find("."+turn+"").length;
+      var thirdLine = $("tbody").find(".thirdLine").find("."+turn+"").length;
+      var fistColumn = $("tbody").find(".firstColumn."+turn+"").length;
+      var secondColumn = $("tbody").find(".secondColumn."+turn+"").length;
+      var thirdColumn = $("tbody").find(".thirdColumn."+turn+"").length;
+      var diagonalLeft = $("tbody").find(".diagonalLeft."+turn+"").length;
+      var diagonalRight = $("tbody").find(".diagonalRight."+turn+"").length;
+
+      if(firstLine === 3 || secondLine === 3 || thirdLine === 3 ||
+         fistColumn === 3 || secondColumn === 3 || thirdColumn === 3 ||
+         diagonalLeft === 3 || diagonalRight === 3){
+        if(turn === "circle"){
+          $(".circlejud").text("先手の勝利！");
+          $(".circlejud").addClass("win");
+          $(".crossjud").text("後手の負け");
+          $(".crossjud").addClass("lose");
+          $(".reset").css("display", "inline-block");
+          gamejud = false;
+        } else if (turn === "cross"){
+          $(".circlejud").text("先手の負け");
+          $(".circlejud").addClass("lose");
+          $(".crossjud").text("後手の勝利！");
+          $(".crossjud").addClass("win");
+          $(".reset").css("display", "inline-block");
+          gamejud = false;
+        }
+      } else if($("tbody").find(".placed").length === 9) {
+        $(".judgement").text("引き分けです……");
+        $(".reset").css("display", "inline-block");
+        gamejud = false;
+        }
+    }
+
+    function computer(){
+
+      var firstLine = $("tbody").find(".firstLine");
+      var secondLine = $("tbody").find(".secondLine");
+      var thirdLine = $("tbody").find(".thirdLine");
+      var firstColumnCross = $("tbody").find(".firstColumn.cross");
+      var secondColumnCross = $("tbody").find(".secondColumn.cross");
+      var thirdColumnCross = $("tbody").find(".thirdColumn.cross");
+      var diagonalLeftCross = $("tbody").find(".diagonalLeft.cross");
+      var diagonalRightCross = $("tbody").find(".diagonalRight.cross");
+
+      var firstColumnCiecle = $("tbody").find(".firstColumn.circle");
+      var secondColumnCiecle = $("tbody").find(".secondColumn.circle");
+      var thirdColumnCiecle = $("tbody").find(".thirdColumn.circle");
+      var diagonalLeftCiecle = $("tbody").find(".diagonalLeft.circle");
+      var diagonalRightCiecle = $("tbody").find(".diagonalRight.circle");
+
+      //初手、中心が空いていれば
+      if(order === 1){
+        setTimeout(function(){
+          if(!$(".secondLine").find(".secondColumn").hasClass("placed")){
+            $(".secondLine").find(".secondColumn").addClass("cross placed");
+          } else {
+            $(".firstLine").find(".firstColumn").addClass("cross placed");
+          }
+          turnChange();
+        }, 1500);
+      } else if(order > 1){
+
+        var place = $("td").length - $(".placed").length;
+        var random = Math.floor(Math.random()*place);
+
+        // console.log(firstColumn.length);
+        // console.log($(".placed").length);
+        // console.log(random);
+
+        setTimeout(function(){
+          if((firstLine.find(".cross").length === 2 || firstLine.find(".circle").length === 2) && $("tbody").find(".firstLine").find(".placed").length !== 3){
+            $(".firstLine").find("td").not(".placed").addClass("cross placed");
+          } else if ((secondLine.find(".cross").length === 2 || secondLine.find(".circle").length === 2) && $("tbody").find(".secondLine").find(".placed").length !== 3){
+            $(".secondLine").find("td").not(".placed").addClass("cross placed");
+          } else if((thirdLine.find(".cross").length === 2 || thirdLine.find(".circle").length === 2) && $("tbody").find(".thirdLine").find(".placed").length !== 3){
+            $(".thirdLine").find("td").not(".placed").addClass("cross placed");
+          } else if((firstColumnCross.length === 2 || firstColumnCiecle.length === 2) && $("tbody").find(".firstColumn.placed").length !== 3){
+            $(".firstColumn").not(".placed").addClass("cross placed");
+          } else if((secondColumnCross.length === 2 || secondColumnCiecle.length === 2) && $("tbody").find(".secondColumn.placed").length !== 3){
+            $(".secondColumn").not(".placed").addClass("cross placed");
+          } else if((thirdColumnCross.length === 2 || thirdColumnCiecle.length === 2) && $("tbody").find(".thirdColumn.placed").length !== 3){
+            $(".thirdColumn").not(".placed").addClass("cross placed");
+          } else if((diagonalLeftCross.length === 2 || diagonalLeftCiecle.length === 2) && $("tbody").find(".diagonalLeft.placed").length !== 3){
+            $(".diagonalLeft").not(".placed").addClass("cross placed");
+          } else if((diagonalRightCross.length === 2 || diagonalRightCiecle.length === 2) && $("tbody").find(".diagonalRight.placed").length !== 3){
+            $(".diagonalRight").not(".placed").addClass("cross placed");
+          } else {
+            $("td").not(".placed").eq(random).addClass("cross placed");
+          }
+          turnChange();
+        }, 1500);
+      }
+    }
+
+    function turnChange(){
+      judgement();
+
+      if (!gamejud){
+        $(".turnText").removeClass("com user");
+        $(".turnText").text("ゲーム終了");
+      } else if(order % 2 === 1){
+        $(".turnText").removeClass("com");
+        $(".turnText").addClass("user");
+        $(".turnText.user").text("あなたの番です");
+      } else if(order % 2 === 0){
+        $(".turnText").removeClass("user");
+        $(".turnText").addClass("com");
+        $(".turnText.com").text("コンピュータの番です");
+      }
+      order ++;
+    }
+
+    $("td").on("click", function(){
+      if($(this).hasClass("placed") || !gamejud || order % 2 === 1){
+        return false;
+      } else {
+        $(this).addClass("circle placed");
+        turnChange();
+        if(gamejud){
+          computer();
+        }
+      }
+      // console.log(order);
+    });
+
+    $(".reset").on("click", function(){
+      location.reload();
+    });
+
+  });
+</script>
+</html>

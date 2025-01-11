@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>blockout</title>
+</head>
+<body>
+    <div>
+        <canvas id="canvas" width="480" height="400"></canvas>
+    </div>
+    <button class="restart">RESTART</button>
+</body>
+<style>
+    canvas{
+        background: #222;
+    }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+    $(function(){
+
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+
+        /***
+         * ボールの設定
+        */
+        var BALL_COLOR = "white";
+        var BALL_RADIUS = 10;
+
+        var ballX = canvas.width / 2;
+        var ballY = canvas.height - 30;
+        var xMove = 2;
+        var yMove = 2;
+
+        /***
+         * 操作する板の設定
+        */
+
+        var BAR_COLOR = "skyblue";
+        var BAR_HEIGHT = 10;
+        var BAR_WIDTH = 75;
+
+        var barX = (canvas.width - BAR_WIDTH) / 2;
+        var rightKeyFlag = false;
+        var leftKeyFlag = false;
+
+        /***
+         * ブロックの設定
+         */
+        var BLOCK_COLOR = "orange";
+        var BLOCK_ROW_COUNT = 5;
+        var BLOCK_COLUMN_COUNT = 5;
+        var BLOCK_WIDTH = 75;
+        var BLOCK_HIEGHT = 20;
+        var BLOCK_MARGIN = 10;
+        var BLOCK_AREA_MARGIN = 30;
+
+        var blockArray = [];
+        for(var i = 0; i < BLOCK_ROW_COUNT * BLOCK_COLUMN_COUNT; i++){
+            var row = Math.floor(i / BLOCK_COLUMN_COUNT);
+            var column = i - (BLOCK_COLUMN_COUNT * row);
+            blockArray.push({
+                x : BLOCK_AREA_MARGIN + BLOCK_MARGIN * column + BLOCK_WIDTH * column,
+                y : BLOCK_AREA_MARGIN + BLOCK_MARGIN * row + BLOCK_HIEGHT * row
+            });
+        }
+
+        function drawnBall(){
+            ballX += xMove;
+            ballY += yMove;
+
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, BALL_RADIUS, 0, Math.PI * 2);
+            ctx.fillStyle = BALL_COLOR;
+            ctx.fill();
+            ctx.closePath();
+            if(ballX + xMove > canvas.width - BALL_RADIUS || ballX + xMove < BALL_RADIUS){
+                xMove = -xMove;
+            }
+
+            if(ballY + yMove < BALL_RADIUS){
+                yMove = -yMove;
+            } else if(ballY + yMove > canvas.height - BALL_RADIUS){
+                if(ballX > barX && ballX < barX + BAR_WIDTH){
+                    yMove = -yMove;
+                } else {
+                    alert("ゲームオーバー");
+                    clearInterval(interval);
+                }
+            }
+        }
+
+        function drawnBlock(){
+            blockArray = blockArray.filter((block, index) => {
+                if(ballX > block.x && ballX < block.x + BLOCK_WIDTH && ballY > block.y && ballY < block.y + BLOCK_HIEGHT){
+                    yMove = -yMove;
+                } else {
+                    return block;
+                }
+            });
+
+            if(blockArray.length === 0){
+                alert("ゲームクリア");
+                clearInterval(interval);
+                return;
+            }
+
+            blockArray.forEach((block) => {
+                ctx.beginPath();
+                ctx.rect(block.x, block.y, BLOCK_WIDTH, BLOCK_HIEGHT);
+                ctx.fillStyle = BLOCK_COLOR;
+                ctx.fill();
+                ctx.closePath();
+            });
+        }
+
+        function drawBar(){
+            if(rightKeyFlag && barX < canvas.width - BAR_WIDTH){
+                barX += 7;
+            } else if(leftKeyFlag && barX > 0) {
+                barX -= 7;
+            }
+
+            ctx.beginPath();
+            ctx.rect(barX, canvas.height - BAR_HEIGHT, BAR_WIDTH, BAR_HEIGHT);
+            ctx.fillStyle = BAR_COLOR;
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function keyDownHandler(e){
+            if(e.key === "Right" || e.key === "ArrowRight"){
+                rightKeyFlag = true;
+            } else if(e.key === "Left" || e.key === "ArrowLeft"){
+                leftKeyFlag = true;
+            }
+        }
+
+        function keyUpHandler(e){
+            if(e.key === "Right" || e.key === "ArrowRight"){
+                rightKeyFlag = false;
+            } else if(e.key === "Left" || e.key === "ArrowLeft"){
+                leftKeyFlag = false;
+            }
+        }
+
+        function draw(){
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawnBall();
+            drawnBlock();
+            drawBar();
+        }
+
+        document.addEventListener("keydown", keyDownHandler);
+        document.addEventListener("keyup", keyUpHandler);
+        var interval = setInterval(draw, 10);
+
+        $(".restart").click(function(){
+            location.reload();
+        });
+
+    });
+
+</script>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
