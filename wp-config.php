@@ -26,7 +26,6 @@
 
 // ** MySQL 設定 - この情報はホスティング先から入手してください。 ** //
 
-var_dump($_SERVER['SERVER_NAME']);
 
 if( $_SERVER['SERVER_NAME'] === "redcastle.jp" ){
 
