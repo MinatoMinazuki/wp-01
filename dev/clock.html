@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>アナログ時計</title>
+    <link rel="stylesheet" href="">
+    <style type="text/css" media="screen">
+        :root {
+          --clock-size: 300px;
+        }
+
+        body {
+          margin: 0;
+          padding: 0;
+        }
+
+        .container {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+          background-color: #f0f0f0;
+        }
+
+        .clock {
+          min-width: var(--clock-size);
+          min-height: var(--clock-size);
+          position: relative;
+          border-radius: 50%;
+          border: 15px solid #444;
+          box-shadow: 24px 8px 8px #888;
+        }
+
+        .clock::before {
+          content: "";
+          position: absolute;
+          top: 6px;
+          bottom: 6px;
+          left: 6px;
+          right: 6px;
+          border-radius: 50%;
+          background: radial-gradient(circle, #fff, #e6e6e6);
+          box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .clock::after {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 20px;
+          height: 20px;
+          transform: translate(-50%,-50%);
+          border-radius: 50%;
+          background: radial-gradient(circle, #444, #222);
+        }
+
+        .numbers {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .number {
+          position: absolute;
+          background-color: #f0f0f0;
+          border-radius: 50%;
+          border: 1px solid #ccc;
+          width: 24px;
+          height: 24px;
+          box-shadow: inset 0 2px 2px #888;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 12px;
+          font-weight: bold;
+          color: black;
+          transform: rotate(calc(30deg * var(--i) - 90deg)) translate(126px) rotate(calc(-30deg * var(--i) + 90deg));
+        }
+
+        .hand {
+          position: absolute;
+          bottom: 50%;
+          left: 50%;
+          transform-origin: bottom;
+          transform: translateX(-50%);
+          box-shadow: 0 2px 4px rgba(0,0,0,.4);
+          border-radius: 4px;
+        }
+
+        .number > span {
+          transform: translateY(1px);
+        }
+
+        .second {
+          width: 2px;
+          height: 120px;
+          background: linear-gradient(to bottom, red, #cc0000);
+          animation-name: rotateHand;
+          animation-duration: 60s;
+          animation-iteration-count: infinite;
+          animation-timing-function: steps(60);
+        }
+
+        .minute {
+          width: 6px;
+          height: 100px;
+          background: linear-gradient(to bottom, #555, #777);
+          animation-name: rotateHand;
+          animation-duration: 3600s;
+          animation-iteration-count: infinite;
+          animation-timing-function: steps(60);
+        }
+
+        .hour {
+          width: 10px;
+          height: 70px;
+          background: linear-gradient(to bottom, #444, #666);
+          animation-name: rotateHand;
+          animation-duration: 43200s;
+          animation-iteration-count: infinite;
+          animation-timing-function: steps(60);
+        }
+
+        @keyframes rotateHand {
+          from {
+            transform: translateX(-50%) rotate(0deg);
+          }
+          to {
+            transform: translateX(-50%) rotate(360deg);
+          }
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+      <div class='clock'>
+        <div class="numbers">
+          <div class="number" style="--i: 1;"><span>Ⅰ</span></div>
+          <div class="number" style="--i: 2;"><span>Ⅱ</span></div>
+          <div class="number" style="--i: 3;"><span>Ⅲ</span></div>
+          <div class="number" style="--i: 4;"><span>Ⅳ</span></div>
+          <div class="number" style="--i: 5;"><span>Ⅴ</span></div>
+          <div class="number" style="--i: 6;"><span>Ⅵ</span></div>
+          <div class="number" style="--i: 7;"><span>Ⅶ</span></div>
+          <div class="number" style="--i: 8;"><span>Ⅷ</span></div>
+          <div class="number" style="--i: 9;"><span>Ⅸ</span></div>
+          <div class="number" style="--i: 10;"><span>Ⅹ</span></div>
+          <div class="number" style="--i: 11;"><span>Ⅺ</span></div>
+          <div class="number" style="--i: 12;"><span>Ⅻ</span></div>
+        </div>
+        <div class='hand hour'></div>
+        <div class='hand minute'></div>
+        <div class='hand second'></div>
+      </div>
+    <!--   <div class='image'></div> -->
+    </div>
+</body>
+    <script type="text/javascript">
+        // script.js
+        function setInitialTime() {
+          const now = new Date();
+          const seconds = now.getSeconds();
+          const minutes = now.getMinutes();
+          const hours = now.getHours();
+
+          const secondHand = document.querySelector('.second');
+          const minuteHand = document.querySelector('.minute');
+          const hourHand = document.querySelector('.hour');
+
+          // 秒、分、時のアニメーション開始位置を計算
+          const secondDelay = -seconds; // 秒針の遅延（マイナス値）
+          const minuteDelay = -(minutes * 60 + seconds); // 分針の遅延（分 + 秒）
+          const hourDelay = -(hours * 3600 + minutes * 60 + seconds); // 時針の遅延
+
+          // アニメーション開始時刻を設定
+          secondHand.style.animationDelay = `${secondDelay}s`;
+          minuteHand.style.animationDelay = `${minuteDelay}s`;
+          hourHand.style.animationDelay = `${hourDelay}s`;
+        }
+
+        setInitialTime();
+    </script>
+</html>

@@ -1,30 +1,17 @@
 <?php
+
+ini_set('display_errors', "On");
+ini_set('error_reporting', E_ALL);
+
+ini_set('post_max_size', '4M');
+
 if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
-    $uploadedFile = $_FILES['file']['tmp_name'];
-    $fileName = pathinfo($_FILES['file']['name'], PATHINFO_FILENAME);
-    $outputFile = "uploads/{$fileName}.jpg";
 
-    try {
-        // Imagickインスタンスの生成
-        $imagick = new Imagick();
-
-        // アップロードされたHEIC画像を読み込む
-        $imagick->readImage($uploadedFile);
-
-        // 画像フォーマットをJPGに変換
-        $imagick->setImageFormat('jpg');
-
-        // 出力画像を保存
-        $imagick->writeImage($outputFile);
-
-        echo "Conversion successful! <a href='$outputFile'>Download JPG</a>";
-    } catch (ImagickException $e) {
-        // Imagickでエラーが発生した場合の処理
-        echo "Error during conversion: " . $e->getMessage();
-    }
+    var_dump(mime_content_type($_FILES['file']['tmp_name']));
 } else {
     echo "No file uploaded or upload error.";
 }
+
 ?>
 
 <!DOCTYPE html>
