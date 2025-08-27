@@ -1,16 +1,6 @@
 <?php
 
-ini_set('display_errors', "On");
-ini_set('error_reporting', E_ALL);
-
-ini_set('post_max_size', '4M');
-
-if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
-
-    var_dump(mime_content_type($_FILES['file']['tmp_name']));
-} else {
-    echo "No file uploaded or upload error.";
-}
+phpinfo();
 
 ?>
 
@@ -30,4 +20,3 @@ if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
   </form>
 </body>
 </html>
-
