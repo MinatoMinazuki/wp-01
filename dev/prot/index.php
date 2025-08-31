@@ -102,6 +102,10 @@
       color:inherit;
     }
 
+    option{
+        color: #333;
+    }
+
     .examples{
       display:flex;
       flex-wrap:wrap;
@@ -334,7 +338,8 @@
               '"':'&quot;',
               '\'':'&#39;'
             }[c];
-        });
+        })
+        .replace(/\r?\n/g, '<br>');
     }
 
     function fakeAIResponse(input)
@@ -418,7 +423,7 @@
     });
 
     query.on("keydown", function(e){
-        if( (e.ctrlKey || e.metaKey) && e.key === "enter" ){
+        if( (e.ctrlKey || e.metaKey) && (e.key === "Enter" || e.keyCode === 13) ){
             sendBtn.click();
         }
     });
