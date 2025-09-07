@@ -40,8 +40,6 @@ $result = json_decode($response, true);
 $promptTokens = $result["usage"]["prompt_tokens"];
 $completionTokens = $result["usage"]["completion_tokens"];
 
-$promptTokens = 125;
-$completionTokens = 125;
 
 $promptRate = PROMPT_RATE;
 $completionRate = COMPLETION_RATE;
@@ -100,11 +98,15 @@ foreach ($result["choices"] as $key => $choice) {
                     `request_id`,
                     `choices_index`,
                     `role`,
+                    `input_num`,
+                    `input_word`,
                     `content`,
                     `finish_reason`
                 )
             VALUES
                 (
+                    '%s',
+                    '%s',
                     '%s',
                     '%s',
                     '%s',
@@ -115,6 +117,8 @@ foreach ($result["choices"] as $key => $choice) {
             $result["id"],
             $choice["index"],
             $choice["message"]["role"],
+            $num,
+            $word,
             $choice["message"]["content"],
             $choice["finish_reason"]
         );
