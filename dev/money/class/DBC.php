@@ -58,6 +58,17 @@ class DBC
         return false;
     }
   }
+
+  /**
+   * 文字列をエスケープする
+   * PDO::quote() を使用し、前後のクォートを除去して返す (sprintf内の '%s' 等と併用するため)
+   */
+  public function escape($str) {
+    if ($str === null) return '';
+    $quoted = $this->dbh->quote($str);
+    // PDO::quote は前後を ' で囲むため、最初と最後の文字を削除する
+    return substr($quoted, 1, -1);
+  }
 }
 
 ?>

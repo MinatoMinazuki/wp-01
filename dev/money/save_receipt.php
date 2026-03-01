@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth/check.php';
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/class/DBC.php';
 
@@ -26,6 +27,7 @@ $storeName   = trim($data['store_name'] ?? '');
 $buyDate     = trim($data['date'] ?? '');
 $category    = trim($data['category'] ?? '');
 $totalAmount = filter_var($data['total_amount'] ?? '', FILTER_VALIDATE_INT) ?: 0;
+$taxAmount   = filter_var($data['tax_amount'] ?? '', FILTER_VALIDATE_INT) ?: 0;
 $items       = isset($data['items']) && is_array($data['items']) ? $data['items'] : [];
 
 if ($buyDate === '') {
@@ -40,17 +42,21 @@ try {
     // 1. レシートマスター情報を挿入
     $sql_master = sprintf("
         INSERT INTO `money_receipt_master` (
+            `user_id`,
             `store_name`,
             `buy_date`,
             `category`,
-            `total_amount`
+            `total_amount`,
+            `tax_amount`
         ) VALUES (
-            '%s', '%s', '%s', %d
+            %d, '%s', '%s', '%s', %d, %d
         )",
+        $userId,
         htmlspecialchars($storeName, ENT_QUOTES, 'UTF-8'),
         htmlspecialchars($buyDate, ENT_QUOTES, 'UTF-8'),
         htmlspecialchars($category, ENT_QUOTES, 'UTF-8'),
-        $totalAmount
+        $totalAmount,
+        $taxAmount
     );
 
     // Dsqlメソッドは INSERT の場合 lastInsertId を返す設計になっている
@@ -83,6 +89,23 @@ try {
             if ($res) {
                 $inserted_items++;
             }
+        }
+    }
+
+    // 3. 保存されたレシート画像の紐付け
+    if (isset($data['saved_images']) && is_array($data['saved_images'])) {
+        foreach ($data['saved_images'] as $fileName) {
+            $sql_img = sprintf("
+                INSERT INTO `money_receipt_images` (
+                    `receipt_id`,
+                    `file_name`
+                ) VALUES (
+                    %d, '%s'
+                )",
+                $receipt_id,
+                $db->escape($fileName)
+            );
+            $db->Dsql($sql_img);
         }
     }
 
