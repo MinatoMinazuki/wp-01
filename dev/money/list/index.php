@@ -117,5 +117,6 @@ $nextMonth = date('Y-m', strtotime($ym . '-01 +1 month'));
     <?php endif; ?>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </body>
 </html>

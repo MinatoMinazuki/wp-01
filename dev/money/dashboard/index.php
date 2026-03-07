@@ -36,7 +36,6 @@ $totalExpense = 0;
 foreach ($categoryData as $cat) {
     if (!$cat['category']) {
         // カテゴリ未設定分も集計には含めるが、表示名は「未設定」に
-        // 実際には SQL で IFNULL など使うのがスマート
     }
     $totalExpense += (int)$cat['amount'];
 }
@@ -58,6 +57,7 @@ unset($cat);
     <title>家計簿支出レポート</title>
     <link rel="stylesheet" href="../src/css/common.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="../src/js/dashboard.js"></script>
 </head>
 <body>
@@ -70,33 +70,33 @@ unset($cat);
 <div class="container overflow-hidden">
     <h1 class="title-with-border">家計簿支出レポート</h1>
     
-    <div style="text-align: right; margin-bottom: 20px;">
-        <a href="../index.php" class="btn btn-info btn-back" style="margin-bottom: 20px;">⬅️ 戻る</a>
+    <div class="text-right mb-20">
+        <a href="../index.php" class="btn btn-info btn-back mb-20">⬅️ 戻る</a>
     </div>
 
     <div class="month-selector">
-        <a href="?ym=<?= $prevMonth ?>" class="btn btn-info" style="border-radius: 20px; font-size: 14px; padding: 6px 15px;">◀︎ 前月</a>
+        <a href="?ym=<?= $prevMonth ?>" class="btn btn-info btn-rounded font-14 py-1 px-3">◀︎ 前月</a>
         <input type="month" value="<?= $ym ?>" class="month-input" onchange="location.href='?ym=' + this.value">
-        <a href="?ym=<?= $nextMonth ?>" class="btn btn-info" style="border-radius: 20px; font-size: 14px; padding: 6px 15px;">次月 ▶︎</a>
+        <a href="?ym=<?= $nextMonth ?>" class="btn btn-info btn-rounded font-14 py-1 px-3">次月 ▶︎</a>
     </div>
 
     <div class="summary-box">
-        <p style="margin: 0; color: #666; font-size: 14px;"><?= date('Y年n月', strtotime($ym.'-01')) ?> の総支出</p>
+        <p class="m-0 text-muted font-14"><?= date('Y年n月', strtotime($ym.'-01')) ?> の総支出</p>
         <p class="summary-amount">¥ <?= number_format($totalExpense) ?></p>
     </div>
 
     <?php if ($totalExpense > 0): ?>
-        <div style="margin-bottom: 40px; height: 300px;">
+        <div class="chart-container">
             <canvas id="expenseChart"></canvas>
         </div>
 
-        <h3 style="color: #2c3e50; border-bottom: 2px solid #2ecc71; padding-bottom: 8px; margin-bottom: 15px;">カテゴリ別内訳</h3>
+        <h3 class="text-primary border-bottom-accent mb-15">カテゴリ別内訳</h3>
         <table class="table table-hover table-responsive">
             <thead>
                 <tr>
                     <th>カテゴリ</th>
-                    <th style="text-align: right;">支出額</th>
-                    <th style="text-align: right;">割合</th>
+                    <th class="text-right">支出額</th>
+                    <th class="text-right">割合</th>
                 </tr>
             </thead>
             <tbody>
@@ -104,7 +104,7 @@ unset($cat);
                     <tr>
                         <td data-label="カテゴリ"><?= htmlspecialchars($cat['category']) ?></td>
                         <td data-label="支出額" class="amount">¥ <?= number_format($cat['amount']) ?></td>
-                        <td data-label="割合" style="text-align: right; color: #666; font-size: 13px;">
+                        <td data-label="割合" class="text-right text-muted font-13">
                             <?= number_format(($cat['amount'] / $totalExpense) * 100, 1) ?> %
                         </td>
                     </tr>

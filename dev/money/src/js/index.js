@@ -1,210 +1,181 @@
-/* index.js - トップ画面用スクリプト */
+/* index.js - トップ画面用スクリプト (jQuery版) */
 
+// 画像プレビュー機能
 function previewImages(input) {
-    const previewContainer = document.getElementById('preview-container');
-    const previewGrid = document.getElementById('preview-grid');
-    const submitBtn = document.getElementById('submit-btn');
+    const $previewContainer = $('#preview-container');
+    const $previewGrid = $('#preview-grid');
+    const $saveImageContainer = $('#save-image-container');
+    const $submitBtn = $('#submit-btn');
 
-    previewGrid.innerHTML = '';
+    $previewGrid.empty();
 
     if (input.files && input.files.length > 0) {
-        Array.from(input.files).forEach(file => {
+        $.each(input.files, function (i, file) {
             const reader = new FileReader();
             reader.onload = function (e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.className = 'preview-item';
-                img.onclick = function () { openModal(this.src); };
-                previewGrid.appendChild(img);
+                $('<img>', {
+                    src: e.target.result,
+                    class: 'preview-item',
+                    click: function () { openModal(e.target.result); }
+                }).appendTo($previewGrid);
             }
             reader.readAsDataURL(file);
         });
-        previewContainer.style.display = 'block';
-        document.getElementById('save-image-container').style.display = 'block';
-        submitBtn.disabled = false;
+        $previewContainer.show();
+        $saveImageContainer.show();
+        $submitBtn.prop('disabled', false);
     } else {
-        previewContainer.style.display = 'none';
-        document.getElementById('save-image-container').style.display = 'none';
-        submitBtn.disabled = true;
+        $previewContainer.hide();
+        $saveImageContainer.hide();
+        $submitBtn.prop('disabled', true);
     }
 }
 
-// モーダルを開く
+// モーダル操作
 function openModal(src) {
-    const modal = document.getElementById('image-modal');
-    const modalImg = document.getElementById('modal-img');
-    modal.style.display = "flex";
-    modalImg.src = src;
+    $('#modal-img').attr('src', src);
+    $('#image-modal').css('display', 'flex');
 }
 
-// モーダルを閉じる
 function closeModal() {
-    document.getElementById('image-modal').style.display = "none";
+    $('#image-modal').hide();
 }
 
-// 商品行を追加する関数
+// 商品行追加
 function addItemRow(name = '', price = '') {
-    const tbody = document.getElementById('items-tbody');
-    const tr = document.createElement('tr');
-
-    tr.innerHTML = `
+    const $tbody = $('#items-tbody');
+    const $tr = $('<tr>').append(`
         <td><input type="text" name="item_name[]" value="${name}" placeholder="商品名" class="form-input" required></td>
         <td><input type="number" name="item_price[]" value="${price}" placeholder="金額" class="form-input" required></td>
         <td style="text-align: center;">
-            <button type="button" class="btn btn-danger btn-remove btn-remove-responsive" onclick="this.closest('tr').remove();" title="削除">×</button>
+            <button type="button" class="btn btn-danger btn-remove btn-remove-responsive" title="削除">×</button>
         </td>
-    `;
-    tbody.appendChild(tr);
+    `);
+    $tbody.append($tr);
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    // フォーム送信処理 (Ajax)
-    const uploadForm = document.getElementById('upload-form');
-    if (uploadForm) {
-        uploadForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
+$(function () {
+    // 削除ボタンの委譲
+    $('#items-tbody').on('click', '.btn-remove', function () {
+        $(this).closest('tr').remove();
+    });
 
-            const fileInput = document.getElementById('receipt-image');
-            if (!fileInput.files.length) return;
+    // 解析フォーム送信
+    $('#upload-form').on('submit', function (e) {
+        e.preventDefault();
 
-            const formData = new FormData();
-            Array.from(fileInput.files).forEach(file => {
-                formData.append('receipt_images[]', file);
-            });
+        const fileInput = $('#receipt-image')[0];
+        if (!fileInput.files.length) return;
 
-            const saveImage = document.getElementById('save-image').checked ? '1' : '0';
-            formData.append('save_image', saveImage);
+        const formData = new FormData();
+        $.each(fileInput.files, (i, file) => {
+            formData.append('receipt_images[]', file);
+        });
 
-            const submitBtn = document.getElementById('submit-btn');
-            const loadingDiv = document.getElementById('loading');
-            const resultContainer = document.getElementById('result-container');
+        const saveImage = $('#save-image').is(':checked') ? '1' : '0';
+        formData.append('save_image', saveImage);
 
-            submitBtn.disabled = true;
-            submitBtn.textContent = "分析中...";
-            loadingDiv.style.display = 'block';
-            resultContainer.style.display = 'none';
+        const $submitBtn = $('#submit-btn');
+        const $loading = $('#loading');
+        const $resultContainer = $('#result-container');
 
-            try {
-                const response = await fetch('analyze_receipt.php', {
-                    method: 'POST',
-                    body: formData
-                });
+        $submitBtn.prop('disabled', true).text("分析中...");
+        $loading.show();
+        $resultContainer.hide();
 
-                const data = await response.json();
+        $.ajax({
+            url: 'analyze_receipt.php',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                $('#edit-store-name').val(data.store_name || '');
+                $('#edit-date').val(data.date || '');
+                $('#edit-category').val(data.category || '');
+                $('#edit-total-amount').val(data.total_amount || '');
+                $('#edit-tax-amount').val(data.tax_amount || 0);
+                $('#edit-saved-images').val(data.saved_images ? JSON.stringify(data.saved_images) : '');
 
-                if (!response.ok) {
-                    throw new Error(data.error || '不明なエラーが発生しました');
-                }
-
-                document.getElementById('edit-store-name').value = data.store_name || '';
-                document.getElementById('edit-date').value = data.date || '';
-                document.getElementById('edit-category').value = data.category || '';
-                document.getElementById('edit-total-amount').value = data.total_amount || '';
-                document.getElementById('edit-tax-amount').value = data.tax_amount || 0;
-
-                if (data.saved_images) {
-                    document.getElementById('edit-saved-images').value = JSON.stringify(data.saved_images);
-                } else {
-                    document.getElementById('edit-saved-images').value = '';
-                }
-
-                const tbody = document.getElementById('items-tbody');
-                tbody.innerHTML = '';
-
+                const $tbody = $('#items-tbody').empty();
                 if (data.items && Array.isArray(data.items)) {
-                    data.items.forEach(item => {
+                    $.each(data.items, (i, item) => {
                         addItemRow(item.name || '', item.price || '');
                     });
                 } else {
                     addItemRow();
                 }
 
-                resultContainer.style.display = 'block';
-
-            } catch (error) {
-                console.error('Error:', error);
-                alert("エラーが発生しました。\n" + error.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = "AIで分析して登録";
-                loadingDiv.style.display = 'none';
+                $resultContainer.show();
+            },
+            error: function (xhr) {
+                const errorData = xhr.responseJSON || {};
+                alert("エラーが発生しました。\n" + (errorData.error || '不明なエラー'));
+            },
+            complete: function () {
+                $submitBtn.prop('disabled', false).text("AIで分析して登録");
+                $loading.hide();
             }
         });
-    }
+    });
 
-    // 「行を追加」ボタンの処理
-    const btnAddItem = document.getElementById('btn-add-item');
-    if (btnAddItem) {
-        btnAddItem.addEventListener('click', function () {
-            addItemRow();
-        });
-    }
+    // 行追加
+    $('#btn-add-item').on('click', function () {
+        addItemRow();
+    });
 
-    // 編集フォーム送信（登録）時の処理
-    const editForm = document.getElementById('edit-form');
-    if (editForm) {
-        editForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
+    // 編集フォーム送信
+    $('#edit-form').on('submit', function (e) {
+        e.preventDefault();
 
-            const formData = new FormData(this);
-            const submitData = Object.fromEntries(formData.entries());
+        const formData = new FormData(this);
+        const submitData = Object.fromEntries(formData.entries());
 
-            submitData.items = [];
-            const itemNames = formData.getAll('item_name[]');
-            const itemPrices = formData.getAll('item_price[]');
+        submitData.items = [];
+        const itemNames = formData.getAll('item_name[]');
+        const itemPrices = formData.getAll('item_price[]');
 
-            for (let i = 0; i < itemNames.length; i++) {
-                submitData.items.push({
-                    name: itemNames[i],
-                    price: itemPrices[i]
-                });
-            }
+        for (let i = 0; i < itemNames.length; i++) {
+            submitData.items.push({
+                name: itemNames[i],
+                price: itemPrices[i]
+            });
+        }
 
-            const savedImagesJson = document.getElementById('edit-saved-images').value;
-            if (savedImagesJson) {
-                try {
-                    submitData.saved_images = JSON.parse(savedImagesJson);
-                } catch (e) {
-                    console.error('Failed to parse saved_images:', e);
-                }
-            }
-
-            const submitBtn = document.getElementById('btn-register');
-            submitBtn.disabled = true;
-            submitBtn.textContent = '登録中...';
-
+        const savedImagesJson = $('#edit-saved-images').val();
+        if (savedImagesJson) {
             try {
-                const response = await fetch('save_receipt.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(submitData)
-                });
+                submitData.saved_images = JSON.parse(savedImagesJson);
+            } catch (err) {
+                console.error('Failed to parse saved_images:', err);
+            }
+        }
 
-                const data = await response.json();
+        const $submitBtn = $('#btn-register');
+        $submitBtn.prop('disabled', true).text('登録中...');
 
-                if (!response.ok) {
-                    throw new Error(data.error || 'データベースの登録に失敗しました');
-                }
-
+        $.ajax({
+            url: 'save_receipt.php',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(submitData),
+            success: function (data) {
                 alert("✅ " + data.message + "\n\nレシートID: " + data.receipt_id + "\n登録された商品数: " + data.inserted_items);
-
-                editForm.reset();
-                document.getElementById('result-container').style.display = 'none';
-                document.getElementById('preview-grid').innerHTML = "";
-                document.getElementById('preview-container').style.display = 'none';
-                document.getElementById('save-image-container').style.display = 'none';
-                document.getElementById('receipt-image').value = "";
-                document.getElementById('submit-btn').disabled = true;
-
-            } catch (error) {
-                console.error('Error:', error);
-                alert("エラーが発生しました。\n" + error.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'この内容で家計簿に登録する';
+                $('#edit-form')[0].reset();
+                $('#result-container').hide();
+                $('#preview-grid').empty();
+                $('#preview-container').hide();
+                $('#save-image-container').hide();
+                $('#receipt-image').val("");
+                $('#submit-btn').prop('disabled', true);
+            },
+            error: function (xhr) {
+                const errorData = xhr.responseJSON || {};
+                alert("エラーが発生しました。\n" + (errorData.error || 'データベースの登録に失敗しました'));
+            },
+            complete: function () {
+                $submitBtn.prop('disabled', false).text('この内容で家計簿に登録する');
             }
         });
-    }
+    });
 });

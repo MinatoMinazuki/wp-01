@@ -1,14 +1,16 @@
-/* dashboard.js - ダッシュボード画面用スクリプト */
+/* dashboard.js - ダッシュボード画面用スクリプト (jQuery版) */
 
 /**
  * Chart.jsを使用して支出グラフを作成する
  * HTML側から渡されるデータを使用して初期化する
  */
 function initExpenseChart(labels, dataVals, bgColors) {
-    const ctx = document.getElementById('expenseChart');
-    if (!ctx) return;
+    const $ctx = $('#expenseChart');
+    if (!$ctx.length) return;
 
-    return new Chart(ctx.getContext('2d'), {
+    const ctx = $ctx[0].getContext('2d');
+
+    return new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: labels,

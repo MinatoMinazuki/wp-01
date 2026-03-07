@@ -71,7 +71,7 @@ h1 {
 /* ボタン */
 .btn {
     display: inline-block;
-    padding: 10px 16px;
+    padding: 10px 13px;
     border-radius: 6px;
     font-size: 14px;
     font-weight: bold;
@@ -463,4 +463,95 @@ input[type="file"] {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         margin: 0;
     }
+}
+
+/* ユーティリティクラス */
+.text-center {
+    text-align: center !important;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.mt-5 {
+    margin-top: 5px !important;
+}
+
+.mt-10 {
+    margin-top: 10px !important;
+}
+
+.mt-25 {
+    margin-top: 25px !important;
+}
+
+.mb-20 {
+    margin-bottom: 20px !important;
+}
+
+.font-13 {
+    font-size: 13px !important;
+}
+
+.font-14 {
+    font-size: 14px !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.flex {
+    display: flex !important;
+}
+
+.gap-5 {
+    gap: 5px !important;
+}
+
+.flex-1 {
+    flex: 1 !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.cursor-pointer {
+    cursor: pointer !important;
+}
+
+/* コンポーネント用 */
+.btn-small {
+    padding: 4px 10px;
+    font-size: 11px;
+    border-radius: 4px;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--primary-color);
+    font-size: 13px;
+    font-weight: normal;
+    font-family: inherit;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+.tax-calculator-box {
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.mt-10-neg {
+    margin-top: -10px !important;
 }
