@@ -27,10 +27,10 @@ try {
 <div class="container overflow-hidden">
     <h1 class="title-with-border">レシート読み取り登録</h1>
     
-    <div style="text-align: right; margin-bottom: 20px;">
-        <a href="manual/index.php" class="btn btn-primary" style="font-size: 14px; margin-right: 10px;">✍️ 手入力</a>
-        <a href="dashboard/index.php" class="btn btn-accent" style="font-size: 14px; margin-right: 10px;">📊 レポート</a>
-        <a href="list/index.php" class="btn btn-info" style="font-size: 14px;">一覧を見る ➡️</a>
+    <div class="button-group">
+        <a href="manual/" class="btn btn-primary">✍️ 手入力</a>
+        <a href="dashboard/" class="btn btn-accent">📊 レポート</a>
+        <a href="list/" class="btn btn-info">一覧を見る ➡️</a>
     </div>
     
     <form id="upload-form">
