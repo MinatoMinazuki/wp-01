@@ -10,7 +10,7 @@ function previewImages(input) {
     $previewGrid.empty();
 
     if (input.files && input.files.length > 0) {
-        $.each(input.files, function (i, file) {
+        Array.from(input.files).forEach(file => {
             const reader = new FileReader();
             reader.onload = function (e) {
                 $('<img>', {
@@ -68,7 +68,7 @@ $(function () {
         if (!fileInput.files.length) return;
 
         const formData = new FormData();
-        $.each(fileInput.files, (i, file) => {
+        Array.from(fileInput.files).forEach(file => {
             formData.append('receipt_images[]', file);
         });
 
@@ -109,8 +109,10 @@ $(function () {
                 $resultContainer.show();
             },
             error: function (xhr) {
+                console.error('Raw response:', xhr.responseText);
                 const errorData = xhr.responseJSON || {};
-                alert("エラーが発生しました。\n" + (errorData.error || '不明なエラー'));
+                const msg = errorData.error || '不明なエラー (' + xhr.status + ' ' + xhr.statusText + ')';
+                alert("エラーが発生しました。\n" + msg + "\n詳細はブラウザのコンソールを確認してください。");
             },
             complete: function () {
                 $submitBtn.prop('disabled', false).text("AIで分析して登録");
@@ -171,7 +173,8 @@ $(function () {
             },
             error: function (xhr) {
                 const errorData = xhr.responseJSON || {};
-                alert("エラーが発生しました。\n" + (errorData.error || 'データベースの登録に失敗しました'));
+                const msg = errorData.error || 'データベースの登録に失敗しました (' + xhr.status + ' ' + xhr.statusText + ')';
+                alert("エラーが発生しました。\n" + msg);
             },
             complete: function () {
                 $submitBtn.prop('disabled', false).text('この内容で家計簿に登録する');

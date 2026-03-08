@@ -3,6 +3,7 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/class/DBC.php';
 
 // 設定: レスポンスはJSONのみで返すためヘッダー指定
+ob_clean(); // バッファにある余計な出力をクリア
 header('Content-Type: application/json; charset=utf-8');
 
 // セッションチェック (AJAX用なのでリダイレクトせずエラーを返す)
@@ -158,12 +159,25 @@ $aiContent = $result['choices'][0]['message']['content'] ?? '';
 // AIのレスポンス（JSONテキスト）をデコード
 $data = json_decode($aiContent, true);
 
+// $data が null の場合のフォールバック
+if (!$data || !is_array($data)) {
+    $data = [
+        'store_name' => '',
+        'date' => date('Y-m-d'),
+        'category' => '',
+        'total_amount' => 0,
+        'tax_amount' => 0,
+        'items' => [],
+        'error_parsing_ai' => true
+    ];
+}
+
 // 画像保存が有効な場合
 $savedImages = [];
 if (isset($_POST['save_image']) && $_POST['save_image'] === '1') {
     $uploadDir = __DIR__ . '/uploads/';
     if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+        @mkdir($uploadDir, 0777, true);
     }
 
     foreach ($uploadedFiles as $f) {
@@ -177,8 +191,11 @@ if (isset($_POST['save_image']) && $_POST['save_image'] === '1') {
         $fileName = bin2hex(random_bytes(16)) . '.' . $ext;
         $destPath = $uploadDir . $fileName;
         
-        if (copy($f['tmp_name'], $destPath)) {
+        if (@copy($f['tmp_name'], $destPath)) {
             $savedImages[] = $fileName;
+        } else {
+            // 書き込み失敗時はエラーログに残すか、レスポンスに含める
+            $data['upload_warning'] = 'uploadsフォルダへの書き込み権限がありません。';
         }
     }
 }

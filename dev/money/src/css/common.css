@@ -446,6 +446,10 @@ input[type="file"] {
         text-align: left;
     }
 
+    .table-responsive td[data-label='操作']::before {
+        display: none;
+    }
+
     .btn-responsive-full {
         width: 100%;
         margin-top: 5px;
