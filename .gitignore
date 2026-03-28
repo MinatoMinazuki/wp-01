@@ -1,3 +1,5 @@
 /dev/prot/config.php
 /dev/prot/vendor/
 /dev/firebase/vendor/
+config.php
+/dev/money/uploads/*
