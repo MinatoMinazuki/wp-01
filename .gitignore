@@ -2,3 +2,4 @@
 /dev/firebase/vendor/
 config.php
 /dev/money/uploads/*
+/dev/likeTwitter/uploads/*
