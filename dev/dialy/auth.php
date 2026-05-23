@@ -4,8 +4,8 @@ require_once __DIR__.'/class/DBC.php';
 
 $dbc = new DBC();
 
-$useId = isset($_SESSION['userId']) ? htmlspecialchars( $_SESSION['userId'] ) ? null;
-$token = isset($_COOKIE['autoLoginToken']) ? htmlspecialchars( $_COOKIE['autoLoginToken'] ) ? null;
+$useId = isset($_SESSION['userId']) ? htmlspecialchars( $_SESSION['userId'] ) : null;
+$token = isset($_COOKIE['autoLoginToken']) ? htmlspecialchars( $_COOKIE['autoLoginToken'] ) : null;
 
 if( !isset($useId) && isset($_COOKIE['autoLoginToken']) ){
 

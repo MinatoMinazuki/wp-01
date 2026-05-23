@@ -1,0 +1,729 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #f4eee2;
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    color: #4a3c31;
+}
+
+/* Login/Register */
+.loginWrapper {
+    height: 100%;
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+}
+
+.loginBox {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(107, 76, 58, 0.08);
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    border-top: 5px solid #8c6239;
+}
+
+.inputGroup {
+    margin-bottom: 20px;
+}
+
+.inputGroup label {
+    display: block;
+    margin-bottom: 5px;
+    color: #6b4c3a;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.inputGroup input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dcd3be;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 16px;
+    background-color: #faf8f5;
+}
+
+.loginSubmitBtn {
+    width: 100%;
+    padding: 14px;
+    background-color: #8c6239;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+
+.loginSubmitBtn:hover {
+    background-color: #6b4c3a;
+}
+
+.errorMsg {
+    color: #e74c3c;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+    background-color: #fcf1f1;
+    border: 1px solid #fab4b4;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.notice {
+    font-size: 13px;
+    color: #6b4c3a;
+    background: #faf8f5;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    border-left: 4px solid #8c6239;
+}
+
+/* Auth/Login links & Titles */
+.authTitle {
+    text-align: center;
+    color: #6b4c3a;
+    margin-bottom: 20px;
+}
+
+.authLinks {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.authLinkText {
+    color: #8c6239;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.authLinkText:hover {
+    text-decoration: underline;
+}
+
+/* Main app container */
+.appContainer {
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    background-color: #fffdf9;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 0 20px rgba(107, 76, 58, 0.1);
+    border-left: 1px solid #dcd3be;
+    border-right: 1px solid #dcd3be;
+}
+
+/* Header */
+.appHeader {
+    height: 60px;
+    background-color: #6b4c3a;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 18px;
+    z-index: 10;
+    border-bottom: 2px solid #4a3325;
+}
+
+.headerTitle {
+    font-weight: bold;
+    letter-spacing: 2px;
+    flex: 1;
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    z-index: -1;
+}
+
+.headerLeft {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#calendarInput {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 1;
+}
+
+#calendarBtn {
+    pointer-events: none;
+    position: relative;
+    z-index: 10;
+}
+
+.headerLeft button {
+    background: none;
+    border: none;
+    color: #f4eee2;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.headerRight {
+    font-size: 14px;
+    color: #e8dcc4;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logoutBtn {
+    color: #e8dcc4;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.2s;
+}
+
+.logoutBtn:hover {
+    color: #f4eee2;
+}
+
+/* Search UI */
+.searchToggleBtn {
+    background: none;
+    border: none;
+    color: #e8dcc4;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.searchToggleBtn:hover {
+    color: #f4eee2;
+}
+
+.searchBarContainer {
+    display: none;
+    background: #fdfaf4;
+    padding: 10px 20px;
+    border-bottom: 1px solid #dcd3be;
+    z-index: 9;
+}
+
+.searchInputWrap {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.searchInput {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #dcd3be;
+    border-radius: 20px;
+    font-size: 14px;
+    outline: none;
+    color: #4a3c31;
+    background: #fff;
+    transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+    border-color: #8c6239;
+}
+
+.searchClearBtn {
+    background: none;
+    border: none;
+    color: #a67c52;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+    display: none;
+}
+
+.searchClearBtn:hover {
+    color: #8c6239;
+}
+
+/* Feed Area (Diary view) */
+.chatFeed {
+    flex: 1;
+    overflow-y: auto;
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: #fffdf9;
+    background-image: linear-gradient(transparent 95%, #f2ebd9 5%);
+    background-size: 100% 28px;
+}
+
+.chatFeed::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chatFeed::-webkit-scrollbar-thumb {
+    background: rgba(139, 98, 57, 0.2);
+    border-radius: 3px;
+}
+
+/* Tweet wrapper */
+.tweet {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 100%;
+    width: 100%;
+}
+
+/* Card Style */
+.tweetBubble {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #a67c52;
+    border-top: 1px solid #f2ebd9;
+    border-right: 1px solid #f2ebd9;
+    border-bottom: 1px solid #f2ebd9;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #4a3c31;
+    word-break: break-word;
+    box-shadow: 0 2px 4px rgba(107, 76, 58, 0.05);
+    position: relative;
+    width: 100%;
+}
+
+.tweetImage {
+    max-width: 100%;
+    border-radius: 4px;
+    margin-top: 15px;
+    display: block;
+    border: 1px solid #f2ebd9;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.tweetImage:hover {
+    opacity: 0.9;
+}
+
+/* Meta info below text */
+.tweetMeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed #dcd3be;
+    gap: 8px;
+}
+
+.tweetTime {
+    font-size: 12px;
+    color: #8e6d55;
+}
+
+.deleteBtn {
+    background: none;
+    border: none;
+    color: #c4b5a7;
+    font-size: 13px;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 2px;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.deleteBtn:hover {
+    color: #e74c3c;
+}
+
+/* Tags display inside tweet */
+.tagsRow {
+    display: block;
+    margin-top: 8px;
+}
+
+.tagsContainer {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.tagBadge {
+    background-color: #f4eee2;
+    color: #8c6239;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #dcd3be;
+    position: relative;
+    padding-right: 24px;
+    line-height: 1;
+}
+
+.removeTagBtn {
+    background: none;
+    border: none;
+    color: #a67c52;
+    font-size: 14px;
+    cursor: pointer;
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: color 0.2s;
+    height: 100%;
+    width: 16px;
+}
+
+.removeTagBtn:hover {
+    color: #e74c3c;
+}
+
+/* Custom tag add dropdown */
+.addTagWrap {
+    position: relative;
+    display: inline-block;
+}
+
+.addTagSelect {
+    appearance: none;
+    background: transparent;
+    border: 1px dashed #a67c52;
+    color: #a67c52;
+    font-size: 14px;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    text-align: center;
+    line-height: 24px;
+    cursor: pointer;
+    outline: none;
+    transition: color 0.2s, border-color 0.2s;
+    font-weight: bold;
+    position: relative;
+}
+
+.addTagSelect:hover {
+    border-color: #8c6239;
+}
+
+.addTagSelect::-ms-expand {
+    display: none;
+}
+
+.addTagLabelPlus {
+    color: #a67c52;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+/* REMOVED DROPDOWN ARROW */
+
+/* Load More Button */
+.loadMoreBtnWrap {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.loadMoreBtn {
+    padding: 8px 24px;
+    border-radius: 20px;
+    border: 1px solid #dcd3be;
+    background: #fffdf9;
+    color: #8e6d55;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+
+.loadMoreBtn:hover {
+    background: #f4eee2;
+}
+
+/* Form Footer Area */
+.appFooter {
+    background-color: #fffdf9;
+    padding: 15px 20px;
+    border-top: 1px solid #dcd3be;
+    z-index: 10;
+    box-shadow: 0 -2px 10px rgba(107, 76, 58, 0.03);
+}
+
+.tagsWrapper {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #dcd3be;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+}
+
+.tagsWrapper:focus-within {
+    border-color: #8c6239;
+}
+
+.tagIcon {
+    color: #8e6d55;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+#tagsInput {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 14px;
+    background: transparent;
+    color: #4a3c31;
+}
+
+.inputWrapper {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.uploadBtn {
+    color: #a67c52;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 5px 0;
+    transition: color 0.2s;
+}
+
+.uploadBtn:hover {
+    color: #8c6239;
+}
+
+#tweetText {
+    flex: 1;
+    border: 1px solid #dcd3be;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 15px;
+    resize: none;
+    height: 46px;
+    max-height: 150px;
+    outline: none;
+    font-family: inherit;
+    background-color: #fff;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+    color: #4a3c31;
+}
+
+#tweetText:focus {
+    border-color: #8c6239;
+    box-shadow: 0 0 0 2px rgba(140, 98, 57, 0.1);
+}
+
+#submitBtn {
+    background-color: #8c6239;
+    color: white;
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+#submitBtn:active {
+    transform: scale(0.97);
+}
+
+#submitBtn:disabled {
+    background-color: #c4b5a7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#imageUpload {
+    display: none;
+}
+
+#imagePreviewContainer {
+    position: relative;
+    margin-top: 12px;
+    display: none;
+}
+
+#imagePreview {
+    max-height: 120px;
+    border-radius: 6px;
+    border: 1px solid #dcd3be;
+    object-fit: contain;
+}
+
+#removeImageBtn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: rgba(74, 60, 49, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    box-shadow: 0 2px 4px rgba(107, 76, 58, 0.2);
+}
+
+.dateDivider {
+    text-align: center;
+    margin: 25px 0 10px;
+    position: relative;
+}
+
+.dateDivider span {
+    background-color: #fffdf9;
+    color: #8e6d55;
+    padding: 4px 15px;
+    font-size: 13px;
+    font-weight: bold;
+    position: relative;
+    z-index: 2;
+    border-radius: 20px;
+}
+
+.loading,
+.noTweets {
+    text-align: center;
+    color: #8e6d55;
+    margin-top: 30px;
+    font-size: 14px;
+    background: transparent;
+    padding: 15px;
+}
+
+/* Image Modal */
+.imageModal {
+    display: none; 
+    position: fixed; 
+    z-index: 9999; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
+    justify-content: center;
+    align-items: center;
+}
+
+.imageModalContent {
+    max-width: 90%;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    object-fit: contain;
+    animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+    from {transform: scale(0.9); opacity: 0;}
+    to {transform: scale(1); opacity: 1;}
+}
+
+.closeModalBtn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10000;
+    transition: color 0.2s;
+}
+
+.closeModalBtn:hover, .closeModalBtn:focus {
+    color: #bbb;
+    text-decoration: none;
+}
+
+/* Copy button in auth forms */
+.inputCopyWrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.inputCopyWrap input {
+    flex: 1;
+    margin-bottom: 0 !important;
+}
+.copyBtn {
+    background: #fffdf9;
+    border: 1px solid #dcd3be;
+    color: #a67c52;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 40px;
+}
+.copyBtn:hover {
+    background: #f4eee2;
+    color: #8c6239;
+    border-color: #8c6239;
+}

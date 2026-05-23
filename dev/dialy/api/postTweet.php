@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__.'/../auth.php';
 header('Content-Type: application/json; charset=utf-8');
 
@@ -11,20 +12,23 @@ $rawTags = isset($_POST['tags']) ? htmlspecialchars( $_POST['tags'] ) : '';
 $rawTags = trim( $rawTags );
 
 
-if ($content === '' && empty($_FILES['image']['name'])) {
+if( $content === '' && empty($_FILES['image']['name']) ){
     echo json_encode(['error' => 'No content provided.']);
     exit;
 }
 
 $imageFile = null;
-if (!empty($_FILES['image']['name'])) {
+if( !empty($_FILES['image']['name']) ){
     if ($_FILES['image']['size'] > 10 * 1024 * 1024) {
         echo json_encode(['error' => '10MB以上の画像はアップロードできません。']);
         exit;
     }
 
-    $uploadDir = __DIR__ . '/../uploads/';
-    if(!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+    $userUploadDir = $userId . '/';
+    $uploadDir = __DIR__ . '/../uploads/' . $userUploadDir;
+    if( !is_dir($uploadDir) ){
+        mkdir($uploadDir, 0777, true);
+    }
 
     $filename = time() . '_' . basename($_FILES['image']['name']);
     $targetFile = $uploadDir . $filename;
@@ -86,7 +90,7 @@ if (!empty($_FILES['image']['name'])) {
         } catch (Exception $e) {
             // Error handling ignored to fallback
         }
-        $imageFile = $filename;
+        $imageFile = $userUploadDir . $filename;
     }
 }
 
@@ -100,8 +104,7 @@ $sql = sprintf("
         content,
         image_file,
         user_id,
-        is_deleted,
-        created_at
+        is_deleted
     ) VALUES (
         '%s',
         %s,
@@ -110,8 +113,7 @@ $sql = sprintf("
     )",
     $contentEsc,
     $imageFileEsc,
-    $userId,
-    0
+    $userId
 );
 
 $insertId = $dbc->Dsql($sql);
@@ -200,7 +202,7 @@ if( $insertId ){
         tweets
         WHERE
         id = %s
-        "
+        ",
         (int)$insertId
     );
 

@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             FROM
             users
             WHERE
-            login_id = ''
+            login_id = '%s'
             ",
             $dbc->escape($loginId)
         );
@@ -83,9 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Login - Diary</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body style="align-items: center;">
+<body>
     <div class="loginWrapper">
-        <h2 style="text-align:center; color: #6b4c3a;">Diary Login</h2>
+        <h2 class="authTitle">Diary Login</h2>
         <div class="loginBox">
             <?php if ($errorMsg): ?>
                 <div class="errorMsg">
@@ -103,8 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="password" id="password" name="password" required>
                 </div>
                 <button type="submit" class="loginSubmitBtn">ログイン</button>
-                <div style="text-align:center; margin-top: 15px;">
-                    <a href="register.php" style="color: #0084ff; text-decoration: none; font-size: 14px;">新規アカウント作成はこちら</a>
+                <div class="authLinks">
+                    <a href="register.php" class="authLinkText">新規アカウント作成はこちら</a>
                 </div>
             </form>
         </div>

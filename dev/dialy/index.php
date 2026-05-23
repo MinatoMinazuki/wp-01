@@ -14,16 +14,25 @@
     <div class="appContainer">
         <!-- Header -->
         <header class="appHeader">
-            <div class="headerLeft" style="position: relative; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;">
-                <input type="date" id="calendarInput" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0; cursor: pointer;">
-                <button id="calendarBtn" title="日付を選択" style="pointer-events: none;"><i class="fas fa-calendar-alt"></i></button>
+            <div class="headerLeft">
+                <input type="date" id="calendarInput">
+                <button id="calendarBtn" title="日付を選択"><i class="fas fa-calendar-alt"></i></button>
             </div>
             <div class="headerTitle">Diary</div>
             <div class="headerRight">
+                <button id="searchToggleBtn" title="検索" class="searchToggleBtn"><i class="fas fa-search"></i></button>
                 <span id="currentDateDisplay">Today</span>
                 <a href="logout.php" class="logoutBtn" title="ログアウト"><i class="fas fa-sign-out-alt"></i></a>
             </div>
         </header>
+
+        <!-- Search Bar -->
+        <div id="searchBarContainer" class="searchBarContainer">
+            <div class="searchInputWrap">
+                <input type="text" id="searchInput" class="searchInput" placeholder="キーワードまたはタグで検索..." autocomplete="off">
+                <button id="searchClearBtn" class="searchClearBtn" title="検索解除"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
 
         <!-- Chat Feed Area -->
         <main class="chatFeed" id="chatFeed">
@@ -43,18 +52,24 @@
                     <label for="imageUpload" class="uploadBtn">
                         <i class="fas fa-image"></i>
                     </label>
-                    <input type="file" id="imageUpload" name="image" accept="image/*" style="display: none;">
+                    <input type="file" id="imageUpload" name="image" accept="image/*">
 
                     <textarea id="tweetText" name="content" placeholder="今どうしてる？" rows="1"></textarea>
 
                     <button type="submit" id="submitBtn" disabled><i class="fas fa-paper-plane"></i></button>
                 </div>
-                <div id="imagePreviewContainer" style="display: none;">
+                <div id="imagePreviewContainer">
                     <img id="imagePreview" src="">
                     <button type="button" id="removeImageBtn"><i class="fas fa-times"></i></button>
                 </div>
             </form>
         </footer>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="imageModal">
+        <span class="closeModalBtn">&times;</span>
+        <img class="imageModalContent" id="modalImage">
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
