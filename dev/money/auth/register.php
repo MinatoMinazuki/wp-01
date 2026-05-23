@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'パスワードは6文字以上で入力してください。';
     } else {
         $db = new DBC();
-        
+
         // 重複チェック
         $sqlCheck = sprintf("SELECT id FROM money_users WHERE email = '%s'", $db->escape($email));
         $exists = $db->select($sqlCheck);
