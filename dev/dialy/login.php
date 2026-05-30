@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/auth.php';
+require_once __DIR__ . '/auth.php';
 
 if (isset($_SESSION['userId'])) {
     header('Location: index.php');
@@ -7,73 +7,38 @@ if (isset($_SESSION['userId'])) {
 }
 
 $errorMsg = '';
+$csrfToken = csrf_token();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $loginId = isset($_POST['loginId']) ? htmlspecialchars( $_POST['loginId'] ) : '';
-    $loginId = trim($loginId);
+    require_csrf();
 
-    $password = isset($_POST['password']) ? htmlspecialchars( $_POST['password'] ) : '';
-    $password = trim($password);
+    $loginId = isset($_POST['loginId']) ? trim((string)$_POST['loginId']) : '';
+    $password = isset($_POST['password']) ? trim((string)$_POST['password']) : '';
 
-
-    if ($loginId !== '' && $password !== '') {
-        $sql = sprintf("
-            SELECT
-            id,
-            password
-            FROM
-            users
-            WHERE
-            login_id = '%s'
+    if ($loginId === '' || $password === '') {
+        $errorMsg = 'IDとパスワードを入力してください。';
+    } else {
+        $user = $dbc->fetchOne(
+            "
+            SELECT id, password
+            FROM users
+            WHERE login_id = :login_id
             ",
-            $dbc->escape($loginId)
+            ['login_id' => $loginId]
         );
 
-        $user = $dbc->Dsql($sql);
+        if ($user !== null && password_verify($password, $user['password'])) {
+            $userId = (int)$user['id'];
+            $_SESSION['userId'] = $userId;
+            create_login_token($dbc, $userId);
 
-        if( is_array($user) && count($user) > 0 ){
-            if( password_verify($password, $user[0]['password']) ){
-                $userId = $user[0]['id'];
-                $_SESSION['userId'] = $userId;
-
-                $token = bin2hex(random_bytes(100));
-                $expiresTime = time() + (90 * 24 * 60 * 60);
-                $expiresAt = date('Y-m-d H:i:s', $expiresTime);
-
-                $sqlToken = sprintf("
-                    INSERT INTO
-                    login_tokens
-                    (
-                        user_id,
-                        token,
-                        expires_at
-                    ) VALUES (
-                        {$userId},
-                        '%s',
-                        '%s'
-                    )
-                    ",
-                    $dbc->escape($token),
-                    $expiresAt
-                );
-
-                $dbc->Dsql($sqlToken);
-
-                setcookie('autoLoginToken', $token, $expiresTime, '/');
-
-                header('Location: index.php');
-                exit;
-            } else {
-                $errorMsg = 'パスワードが間違っています。';
-            }
-        } else {
-            $errorMsg = 'IDが見つかりません。';
+            header('Location: index.php');
+            exit;
         }
-    } else {
-        $errorMsg = 'IDとパスワードを入力してください。';
+
+        $errorMsg = 'IDまたはパスワードが違います。';
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -88,12 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2 class="authTitle">Diary Login</h2>
         <div class="loginBox">
             <?php if ($errorMsg): ?>
-                <div class="errorMsg">
-                    <?= htmlspecialchars($errorMsg) ?>
-                </div>
+                <div class="errorMsg"><?= h($errorMsg) ?></div>
             <?php endif; ?>
 
             <form method="POST">
+                <input type="hidden" name="csrfToken" value="<?= h($csrfToken) ?>">
                 <div class="inputGroup">
                     <label for="loginId">ログインID</label>
                     <input type="text" id="loginId" name="loginId" required>

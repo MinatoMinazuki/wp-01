@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once __DIR__.'/class/DBC.php';
+require_once __DIR__ . '/class/DBC.php';
+require_once __DIR__ . '/includes/helpers.php';
 
 if (isset($_SESSION['userId'])) {
     header('Location: index.php');
@@ -9,99 +10,61 @@ if (isset($_SESSION['userId'])) {
 
 $dbc = new DBC();
 $errorMsg = '';
-$successMsg = '';
+$csrfToken = csrf_token();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $loginId = isset($_POST['loginId']) ? htmlspecialchars( $_POST['loginId'] ) : '';
-    $loginId = trim($loginId);
+    require_csrf();
 
-    $password = isset($_POST['password']) ? htmlspecialchars( $_POST['password'] ) : '';
-
+    $loginId = isset($_POST['loginId']) ? trim((string)$_POST['loginId']) : '';
+    $password = isset($_POST['password']) ? (string)$_POST['password'] : '';
 
     if (strlen($loginId) < 6 || strlen($loginId) > 20) {
         $errorMsg = 'ログインIDは6文字以上20文字以内で入力してください。';
     } elseif (strlen($password) < 8 || strlen($password) > 32) {
         $errorMsg = 'パスワードは8文字以上32文字以内で入力してください。';
     } else {
-        $sqlCheck = sprintf("
-            SELECT
-            id
-            FROM
-            users
-            WHERE
-            login_id = '%s'
+        $existing = $dbc->fetchOne(
+            "
+            SELECT id
+            FROM users
+            WHERE login_id = :login_id
             ",
-            $dbc->escape($loginId)
+            ['login_id' => $loginId]
         );
 
-        $existing = $dbc->Dsql($sqlCheck);
-        if( is_array($existing) && count($existing) > 0 ){
-            $errorMsg = 'このログインIDは既に使用されています。';
+        if ($existing !== null) {
+            $errorMsg = 'このログインIDはすでに使用されています。';
         } else {
-            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-            $sqlInsert = sprintf("
-                INSERT INTO
-                users
-                (
-                    login_id,
-                    password
-                ) VALUES (
-                    '%s',
-                    '%s'
-                )
+            $insertId = (int)$dbc->insert(
+                "
+                INSERT INTO users (login_id, password)
+                VALUES (:login_id, :password)
                 ",
-                $dbc->escape($loginId),
-                $dbc->escape($passwordHash)
+                [
+                    'login_id' => $loginId,
+                    'password' => password_hash($password, PASSWORD_DEFAULT),
+                ]
             );
 
-            $insertId = $dbc->Dsql($sqlInsert);
-
-            if ($insertId) {
+            if ($insertId > 0) {
                 $_SESSION['userId'] = $insertId;
-
-                $token = bin2hex(random_bytes(100));
-                $expiresTime = time() + (90 * 24 * 60 * 60);
-                $expiresAt = date('Y-m-d H:i:s', $expiresTime);
-
-                $sqlToken = sprintf("
-                    INSERT INTO
-                    login_tokens
-                    (
-                        user_id,
-                        token,
-                        expires_at
-                    ) VALUES (
-                        %s,
-                        '%s',
-                        '%s'
-                    )
-                    ",
-                    $insertId,
-                    $dbc->escape($token),
-                    $expiresAt
-                );
-
-                $dbc->Dsql($sqlToken);
-
-                setcookie('autoLoginToken', $token, $expiresTime, '/');
+                create_login_token($dbc, $insertId);
 
                 header('Location: index.php');
                 exit;
-            } else {
-                $errorMsg = '登録に失敗しました。';
             }
+
+            $errorMsg = '登録に失敗しました。';
         }
     }
 } else {
-    // Generate initial preset values
     $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     $_POST['loginId'] = substr(str_shuffle($chars), 0, 8);
     $_POST['password'] = substr(str_shuffle($chars), 0, 12);
 }
 
-$loginIdVal = isset($_POST['loginId']) ? $_POST['loginId'] : '';
-$passwordVal = isset($_POST['password']) ? $_POST['password'] : '';
-
+$loginIdVal = isset($_POST['loginId']) ? (string)$_POST['loginId'] : '';
+$passwordVal = isset($_POST['password']) ? (string)$_POST['password'] : '';
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -117,26 +80,27 @@ $passwordVal = isset($_POST['password']) ? $_POST['password'] : '';
         <h2 class="authTitle">新規アカウント登録</h2>
         <div class="loginBox">
             <?php if ($errorMsg): ?>
-                <div class="errorMsg">
-                    <?= htmlspecialchars($errorMsg) ?>
-                </div>
+                <div class="errorMsg"><?= h($errorMsg) ?></div>
             <?php endif; ?>
+
             <div class="notice">
-                ID・パスワードはご自由に変更可能<br>
-                (ID: 6文字以上20文字以内, パスワード: 8文字以上32文字以内)
+                IDとパスワードは自由に変更できます。<br>
+                ID: 6文字以上20文字以内 / パスワード: 8文字以上32文字以内
             </div>
+
             <form method="POST">
+                <input type="hidden" name="csrfToken" value="<?= h($csrfToken) ?>">
                 <div class="inputGroup">
                     <label for="loginId">ログインID</label>
                     <div class="inputCopyWrap">
-                        <input type="text" id="loginId" name="loginId" value="<?= htmlspecialchars($loginIdVal) ?>" required minlength="6" maxlength="20">
+                        <input type="text" id="loginId" name="loginId" value="<?= h($loginIdVal) ?>" required minlength="6" maxlength="20">
                         <button type="button" class="copyBtn" onclick="copyToClipboard('loginId', this)" title="コピー"><i class="fas fa-copy"></i></button>
                     </div>
                 </div>
                 <div class="inputGroup">
                     <label for="password">パスワード</label>
                     <div class="inputCopyWrap">
-                        <input type="text" id="password" name="password" value="<?= htmlspecialchars($passwordVal) ?>" required minlength="8" maxlength="32">
+                        <input type="text" id="password" name="password" value="<?= h($passwordVal) ?>" required minlength="8" maxlength="32">
                         <button type="button" class="copyBtn" onclick="copyToClipboard('password', this)" title="コピー"><i class="fas fa-copy"></i></button>
                     </div>
                 </div>
@@ -181,7 +145,7 @@ $passwordVal = isset($_POST['password']) ? $_POST['password'] : '';
                 document.execCommand('copy');
                 successCallback();
             } catch (err) {
-                alert('コピーに失敗しました。お手数ですが手動でコピーしてください。');
+                alert('コピーに失敗しました。手動でコピーしてください。');
             }
             window.getSelection().removeAllRanges();
         }

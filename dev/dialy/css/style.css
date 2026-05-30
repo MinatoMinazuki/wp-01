@@ -139,16 +139,17 @@ body {
 
 /* Header */
 .appHeader {
-    height: 60px;
+    min-height: 60px;
     background-color: #6b4c3a;
     color: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
+    padding: 8px 14px;
     font-size: 18px;
     z-index: 10;
     border-bottom: 2px solid #4a3325;
+    gap: 8px;
 }
 
 .headerTitle {
@@ -164,36 +165,44 @@ body {
 
 .headerLeft {
     position: relative;
-    width: 40px;
+    min-width: 126px;
     height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 4px;
 }
 
 #calendarInput {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    width: 36px;
     height: 100%;
     opacity: 0;
     z-index: 1;
-}
-
-#calendarBtn {
     pointer-events: none;
-    position: relative;
-    z-index: 10;
 }
 
-.headerLeft button {
+.headerLeft button,
+.dateNavBtn,
+.calendarIconBtn {
     background: none;
     border: none;
     color: #f4eee2;
-    font-size: 20px;
+    font-size: 16px;
     cursor: pointer;
-    padding: 5px;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.headerLeft button:hover,
+.dateNavBtn:hover,
+.calendarIconBtn:hover {
+    background-color: rgba(255, 255, 255, 0.12);
 }
 
 .headerRight {
@@ -201,7 +210,14 @@ body {
     color: #e8dcc4;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
+    min-width: 166px;
+    justify-content: flex-end;
+}
+
+#currentDateDisplay {
+    white-space: nowrap;
+    font-weight: bold;
 }
 
 .logoutBtn {
@@ -323,6 +339,53 @@ body {
     width: 100%;
 }
 
+.tweetContent {
+    padding-right: 28px;
+}
+
+.tweetActions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+}
+
+.tweetMenuBtn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #a67c52;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.tweetMenuBtn:hover {
+    background-color: #f4eee2;
+    color: #6b4c3a;
+}
+
+.tweetMenu {
+    position: absolute;
+    right: 0;
+    top: 34px;
+    display: none;
+    min-width: 110px;
+    background: #fff;
+    border: 1px solid #dcd3be;
+    border-radius: 6px;
+    box-shadow: 0 8px 20px rgba(107, 76, 58, 0.14);
+    padding: 6px;
+}
+
+.tweetMenu.isOpen {
+    display: block;
+}
+
 .tweetImage {
     max-width: 100%;
     border-radius: 4px;
@@ -354,20 +417,23 @@ body {
 }
 
 .deleteBtn {
+    width: 100%;
     background: none;
     border: none;
-    color: #c4b5a7;
+    color: #8e6d55;
     font-size: 13px;
     cursor: pointer;
-    transition: color 0.2s;
-    padding: 2px;
-    margin-left: auto;
+    transition: background-color 0.2s, color 0.2s;
+    padding: 8px 10px;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
+    border-radius: 4px;
+    text-align: left;
 }
 
 .deleteBtn:hover {
+    background: #fcf1f1;
     color: #e74c3c;
 }
 
@@ -498,6 +564,8 @@ body {
 .tagsWrapper {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
     background-color: #fff;
     border: 1px solid #dcd3be;
     border-radius: 6px;
@@ -513,16 +581,81 @@ body {
 .tagIcon {
     color: #8e6d55;
     font-size: 14px;
-    margin-right: 10px;
+    margin-right: 4px;
 }
 
 #tagsInput {
     border: none;
     outline: none;
     flex: 1;
+    min-width: 140px;
     font-size: 14px;
     background: transparent;
     color: #4a3c31;
+}
+
+.composerTagChips {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.composerTagChip {
+    background-color: #efe3d1;
+    color: #6b4c3a;
+    border: 1px solid #d5c1a5;
+    border-radius: 16px;
+    padding: 5px 8px 5px 10px;
+    font-size: 12px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.composerTagRemove {
+    border: none;
+    background: rgba(107, 76, 58, 0.12);
+    color: #6b4c3a;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 12px;
+}
+
+.tagSuggestions {
+    display: none;
+    flex-wrap: nowrap;
+    gap: 6px;
+    overflow-x: auto;
+    margin: -4px 0 12px;
+    padding-bottom: 2px;
+}
+
+.tagSuggestions:not(:empty) {
+    display: flex;
+}
+
+.tagSuggestionBtn {
+    flex: 0 0 auto;
+    border: 1px solid #dcd3be;
+    background: #fdfaf4;
+    color: #8c6239;
+    border-radius: 16px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.tagSuggestionBtn:hover {
+    background: #f4eee2;
+    border-color: #a67c52;
 }
 
 .inputWrapper {
@@ -650,6 +783,48 @@ body {
     font-size: 14px;
     background: transparent;
     padding: 15px;
+}
+
+.noTweets {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.noTweets i {
+    font-size: 24px;
+    color: #a67c52;
+}
+
+@media (max-width: 480px) {
+    .appHeader {
+        padding: 8px 10px;
+    }
+
+    .headerTitle {
+        display: none;
+    }
+
+    .headerLeft {
+        min-width: 112px;
+    }
+
+    .headerLeft button,
+    .dateNavBtn,
+    .calendarIconBtn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .headerRight {
+        min-width: 0;
+        gap: 8px;
+    }
+
+    #currentDateDisplay {
+        font-size: 13px;
+    }
 }
 
 /* Image Modal */

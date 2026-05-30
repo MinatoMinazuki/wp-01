@@ -1,78 +1,331 @@
-$(document).ready(function () {
-    const today = new Date();
-    let currentDate = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
+$(function () {
+    const csrfToken = $('meta[name="csrf-token"]').attr('content') || '';
+    let currentDate = toYmd(new Date());
     let currentSearch = '';
     let allTags = [];
+    let selectedTags = [];
     let loadedTweets = [];
     let isLoading = false;
     let hasMore = true;
 
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if ((settings.type || settings.method || '').toUpperCase() === 'POST') {
+                xhr.setRequestHeader('X-CSRF-Token', csrfToken);
+            }
+        }
+    });
+
+    setCurrentDate(currentDate, false);
     fetchAllTags(function () {
+        renderTagSuggestions();
         loadTweets(false);
     });
 
-    $('#currentDateDisplay').text(formatDateYMD(today));
-
-    $('#calendarBtn').click(function () {
-        $('#calendarInput').click();
+    $('#calendarBtn').on('click', function () {
+        const calendarInput = $('#calendarInput')[0];
+        if (calendarInput.showPicker) {
+            calendarInput.showPicker();
+        } else {
+            calendarInput.focus();
+            calendarInput.click();
+        }
     });
 
-    $('#searchToggleBtn').click(function () {
-        $('#searchBarContainer').slideToggle(200);
-        if ($('#searchBarContainer').is(':visible')) {
-            $('#searchInput').focus();
+    $('#prevDateBtn').on('click', function () {
+        shiftDate(-1);
+    });
+
+    $('#nextDateBtn').on('click', function () {
+        shiftDate(1);
+    });
+
+    $('#calendarInput').on('change', function () {
+        if (this.value) {
+            setCurrentDate(this.value, true);
         }
+    });
+
+    $('#searchToggleBtn').on('click', function () {
+        $('#searchBarContainer').slideToggle(200, function () {
+            if ($(this).is(':visible')) {
+                $('#searchInput').trigger('focus');
+            }
+        });
     });
 
     $('#searchInput').on('keydown', function (e) {
         if ((e.key === 'Enter' || e.keyCode === 13) && !e.isComposing) {
             e.preventDefault();
-            let sq = $(this).val().trim();
-            currentSearch = sq;
-            if (currentSearch !== '') {
-                $('#searchClearBtn').show();
-            } else {
-                $('#searchClearBtn').hide();
-            }
+            currentSearch = $(this).val().trim();
+            $('#searchClearBtn').toggle(currentSearch !== '');
             loadTweets(false);
         }
     });
 
-    $('#searchClearBtn').click(function () {
+    $('#searchClearBtn').on('click', function () {
         $('#searchInput').val('');
         currentSearch = '';
         $(this).hide();
         loadTweets(false);
     });
 
-    $('#calendarInput').change(function () {
+    $('#tagsInput').on('keydown', function (e) {
+        if ((e.key === 'Enter' || e.key === ',' || e.keyCode === 13) && !e.isComposing) {
+            e.preventDefault();
+            addComposerTag($(this).val());
+            $(this).val('');
+        }
+
+        if (e.key === 'Backspace' && $(this).val() === '' && selectedTags.length > 0) {
+            selectedTags.pop();
+            renderComposerTags();
+        }
+    });
+
+    $('#tagsInput').on('blur', function () {
+        addComposerTag($(this).val());
+        $(this).val('');
+    });
+
+    $('#composerTagChips').on('click', '.composerTagRemove', function () {
+        const tagName = $(this).data('tag-name');
+        selectedTags = selectedTags.filter(function (tag) {
+            return tag !== tagName;
+        });
+        renderComposerTags();
+    });
+
+    $('#tagSuggestions').on('click', '.tagSuggestionBtn', function () {
+        addComposerTag($(this).data('tag-name'));
+    });
+
+    window.triggerLoadMore = function () {
+        loadTweets(true);
+    };
+
+    window.adjustScroll = function () {
+        const chatFeed = $('#chatFeed')[0];
+        if (chatFeed.scrollTop + chatFeed.clientHeight >= chatFeed.scrollHeight - 500) {
+            chatFeed.scrollTop = chatFeed.scrollHeight;
+        }
+    };
+
+    $('#chatFeed').on('scroll', function () {
+        if ($(this).scrollTop() === 0 && hasMore && !isLoading && loadedTweets.length > 0) {
+            loadTweets(true);
+        }
+    });
+
+    $('#tweetText').on('input', function () {
+        checkSubmitState();
+        $(this).css('height', '46px');
+        $(this).css('height', Math.min(this.scrollHeight, 150) + 'px');
+    });
+
+    $('#tweetText').on('keydown', function (e) {
+        const isPc = window.matchMedia('(any-hover: hover)').matches;
+        if (isPc && e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (!$('#submitBtn').prop('disabled')) {
+                $('#tweetForm').trigger('submit');
+            }
+        }
+    });
+
+    $('#imageUpload').on('change', function () {
+        if (!this.files || !this.files[0]) {
+            checkSubmitState();
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            $('#imagePreview').attr('src', e.target.result);
+            $('#imagePreviewContainer').show();
+            checkSubmitState();
+        };
+        reader.readAsDataURL(this.files[0]);
+    });
+
+    $('#removeImageBtn').on('click', function () {
+        $('#imageUpload').val('');
+        $('#imagePreview').attr('src', '');
+        $('#imagePreviewContainer').hide();
+        checkSubmitState();
+    });
+
+    $('#tweetForm').on('submit', function (e) {
+        e.preventDefault();
+        syncTagsInput();
+
+        const formData = new FormData(this);
+        $('#submitBtn').prop('disabled', true);
+
+        $.ajax({
+            url: 'api/postTweet.php',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function (response) {
+                if (response.success && response.tweet) {
+                    loadedTweets.push(response.tweet);
+                    renderAllTweets();
+                    scrollToBottom();
+                    resetComposer();
+                    fetchAllTags(renderTagSuggestions);
+                } else {
+                    alert('投稿に失敗しました: ' + (response.error || '不明なエラー'));
+                    checkSubmitState();
+                }
+            },
+            error: function () {
+                alert('通信エラーが発生しました。');
+                checkSubmitState();
+            }
+        });
+    });
+
+    $('#chatFeed').on('click', '.tweetMenuBtn', function (e) {
+        e.stopPropagation();
+        const $menu = $(this).siblings('.tweetMenu');
+        $('.tweetMenu').not($menu).removeClass('isOpen');
+        $menu.toggleClass('isOpen');
+    });
+
+    $(document).on('click', function () {
+        $('.tweetMenu').removeClass('isOpen');
+    });
+
+    $('#chatFeed').on('click', '.deleteBtn', function (e) {
+        e.stopPropagation();
+        const tweetId = $(this).data('id');
+        $('.tweetMenu').removeClass('isOpen');
+
+        if (!confirm('この記録を削除しますか？')) {
+            return;
+        }
+
+        $.ajax({
+            url: 'api/deleteTweet.php',
+            method: 'POST',
+            data: { tweetId: tweetId },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    $('#tweet-' + tweetId).fadeOut(300, function () {
+                        $(this).remove();
+                        loadedTweets = loadedTweets.filter(function (tweet) {
+                            return String(tweet.id) !== String(tweetId);
+                        });
+                    });
+                } else {
+                    alert('削除に失敗しました: ' + (response.error || '不明なエラー'));
+                }
+            },
+            error: function () {
+                alert('通信エラーが発生しました。');
+            }
+        });
+    });
+
+    $('#chatFeed').on('change', '.addTagSelect', function () {
+        const tagId = $(this).val();
+        const tweetId = $(this).data('tweet-id');
+        const $select = $(this);
+
+        if (!tagId) {
+            return;
+        }
+
+        $select.prop('disabled', true);
+
+        $.ajax({
+            url: 'api/addTagToTweet.php',
+            method: 'POST',
+            data: { tweetId: tweetId, tagId: tagId },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success && response.tags) {
+                    updateTweetTags(tweetId, response.tags);
+                } else {
+                    alert('タグの追加に失敗しました。');
+                    $select.prop('disabled', false).val('');
+                }
+            },
+            error: function () {
+                alert('通信エラーが発生しました。');
+                $select.prop('disabled', false).val('');
+            }
+        });
+    });
+
+    $('#chatFeed').on('click', '.removeTagBtn', function () {
+        const tweetId = $(this).data('tweet-id');
+        const tagName = $(this).data('tag-name');
+        const $button = $(this);
+
+        $button.prop('disabled', true);
+
+        $.ajax({
+            url: 'api/removeTagFromTweet.php',
+            method: 'POST',
+            data: { tweetId: tweetId, tagName: tagName },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success && response.tags) {
+                    updateTweetTags(tweetId, response.tags);
+                    fetchAllTags(renderTagSuggestions);
+                } else {
+                    alert('タグの削除に失敗しました。');
+                    $button.prop('disabled', false);
+                }
+            },
+            error: function () {
+                alert('通信エラーが発生しました。');
+                $button.prop('disabled', false);
+            }
+        });
+    });
+
+    $('#chatFeed').on('click', '.tweetImage', function () {
+        $('#modalImage').attr('src', $(this).attr('src'));
+        $('#imageModal').css('display', 'flex').hide().fadeIn(200);
+    });
+
+    $('#imageModal').on('click', function (e) {
+        if (e.target !== $('#modalImage')[0]) {
+            $(this).fadeOut(200);
+        }
+    });
+
+    $('.closeModalBtn').on('click', function () {
+        $('#imageModal').fadeOut(200);
+    });
+
+    function setCurrentDate(ymd, shouldLoad) {
+        currentDate = ymd;
+        $('#calendarInput').val(ymd);
+        $('#currentDateDisplay').text(formatYmdText(ymd));
+        if (shouldLoad) {
+            clearSearch();
+            loadTweets(false);
+        }
+    }
+
+    function shiftDate(days) {
+        const date = parseYmd(currentDate);
+        date.setDate(date.getDate() + days);
+        setCurrentDate(toYmd(date), true);
+    }
+
+    function clearSearch() {
         $('#searchInput').val('');
         currentSearch = '';
         $('#searchClearBtn').hide();
         $('#searchBarContainer').slideUp(200);
-
-        if ($(this).val()) {
-            currentDate = $(this).val();
-            let parts = currentDate.split('-');
-            $('#currentDateDisplay').text(parts[0] + '年' + parseInt(parts[1]) + '月' + parseInt(parts[2]) + '日');
-            loadTweets(false);
-        } else {
-            const tempDate = new Date();
-            currentDate = tempDate.getFullYear() + '-' + ('0' + (tempDate.getMonth() + 1)).slice(-2) + '-' + ('0' + tempDate.getDate()).slice(-2);
-            $('#currentDateDisplay').text(formatDateYMD(tempDate));
-            loadTweets(false);
-        }
-    });
-
-    function formatDateYMD(date) {
-        return date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日';
-    }
-
-    function formatTimeStr(isoString) {
-        let parts = isoString.split(' ');
-        if (parts.length < 2) return '';
-        let timeParts = parts[1].split(':');
-        return parseInt(timeParts[0]) + '時' + timeParts[1] + '分';
     }
 
     function fetchAllTags(callback) {
@@ -92,36 +345,11 @@ $(document).ready(function () {
         });
     }
 
-    function generateTagSelectHtml(tweetId, currentTags) {
-        let optionsHtml = '<option value="">+</option>';
-        let addedCount = 0;
-        allTags.forEach(function (tag) {
-            if (!currentTags.includes(tag.name)) {
-                optionsHtml += `<option value="${tag.id}">${escapeHtml(tag.name)}</option>`;
-                addedCount++;
-            }
-        });
-
-        if (addedCount === 0) {
-            return '';
+    function loadTweets(isAppend) {
+        if (isLoading || (isAppend && !hasMore)) {
+            return;
         }
 
-        return `
-            <div class="addTagWrap">
-                <select class="addTagSelect" data-tweet-id="${tweetId}">
-                    ${optionsHtml}
-                </select>
-            </div>
-        `;
-    }
-
-    // Export so button can call it
-    window.triggerLoadMore = function () {
-        loadTweets(true);
-    };
-
-    function loadTweets(isAppend) {
-        if (isLoading || (isAppend && !hasMore)) return;
         isLoading = true;
 
         if (!isAppend) {
@@ -136,21 +364,18 @@ $(document).ready(function () {
             if (isAppend && loadedTweets.length > 0) {
                 url += '&before_id=' + loadedTweets[0].id;
             }
-        } else {
-            if (isAppend) {
-                if (loadedTweets.length > 0) {
-                    url += 'before_id=' + loadedTweets[0].id;
-                } else if (currentDate) {
-                    url += 'before_date=' + currentDate;
-                }
+        } else if (isAppend) {
+            if (loadedTweets.length > 0) {
+                url += 'before_id=' + loadedTweets[0].id;
             } else if (currentDate) {
-                url += 'date=' + currentDate;
+                url += 'before_date=' + currentDate;
             }
+        } else if (currentDate) {
+            url += 'date=' + currentDate;
         }
 
-        let topTweetId = null;
-        if (isAppend && loadedTweets.length > 0) {
-            topTweetId = loadedTweets[0].id; // Keep track of current top item
+        const topTweetId = isAppend && loadedTweets.length > 0 ? loadedTweets[0].id : null;
+        if (topTweetId) {
             $('.loadMoreBtn').text('Loading...');
         }
 
@@ -160,26 +385,24 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (response) {
                 if (response.error) {
-                    if (!isAppend) $('#chatFeed').html('<div class="errorMsg">エラー: ' + escapeHtml(response.error) + '</div>');
+                    if (!isAppend) {
+                        $('#chatFeed').html('<div class="errorMsg">エラー: ' + escapeHtml(response.error) + '</div>');
+                    }
                     isLoading = false;
                     return;
                 }
 
                 hasMore = response.hasMore;
-
-                if (isAppend) {
-                    loadedTweets = (response.tweets || []).concat(loadedTweets);
-                } else {
-                    loadedTweets = response.tweets || [];
-                }
+                loadedTweets = isAppend
+                    ? (response.tweets || []).concat(loadedTweets)
+                    : (response.tweets || []);
 
                 renderAllTweets();
 
-                // Restore scroll position when appending
-                if (isAppend && topTweetId) {
-                    let elem = $('#tweet-' + topTweetId)[0];
-                    if (elem) {
-                        let container = $('#chatFeed')[0];
+                if (topTweetId) {
+                    const elem = $('#tweet-' + topTweetId)[0];
+                    const container = $('#chatFeed')[0];
+                    if (elem && container) {
                         container.scrollTop = elem.offsetTop - container.offsetTop - 50;
                     }
                 } else if (!isAppend) {
@@ -201,306 +424,213 @@ $(document).ready(function () {
         $('#chatFeed').empty();
 
         if (loadedTweets.length === 0) {
-            let label = currentSearch ? "一致する記録はありません。" : (currentDate ? "この日の記録はありません。" : "まだ記録がありません。");
-            $('#chatFeed').html(`<div class="noTweets">${label}</div>`);
+            const label = currentSearch
+                ? '一致する記録はありません。'
+                : 'この日の記録はありません。';
+            $('#chatFeed').html(`<div class="noTweets"><i class="fas fa-pen-nib"></i><span>${label}</span></div>`);
 
             if (hasMore) {
-                $('#chatFeed').prepend(`
-                    <div class="loadMoreBtnWrap">
-                        <button class="loadMoreBtn" onclick="triggerLoadMore()">さらに過去の記録を読み込む</button>
-                    </div>
-                `);
+                $('#chatFeed').prepend(loadMoreButtonHtml());
             }
             return;
         }
 
-        // Add 'Load More' button at the top if there are more older tweets
         if (hasMore) {
-            $('#chatFeed').append(`
-                <div class="loadMoreBtnWrap">
-                    <button class="loadMoreBtn" onclick="triggerLoadMore()">さらに過去の記録を読み込む</button>
-                </div>
-            `);
+            $('#chatFeed').append(loadMoreButtonHtml());
         }
 
         let lastDate = null;
         loadedTweets.forEach(function (tweet) {
-            let tweetDateStr = tweet.createdAt.substring(0, 10);
-            let dParts = tweetDateStr.split('-');
-            let formattedDivider = dParts[0] + '年' + parseInt(dParts[1]) + '月' + parseInt(dParts[2]) + '日';
+            const tweetDateStr = tweet.createdAt.substring(0, 10);
 
             if (tweetDateStr !== lastDate) {
                 $('#chatFeed').append(`
                     <div class="dateDivider">
-                        <span>${formattedDivider}</span>
+                        <span>${formatYmdText(tweetDateStr)}</span>
                     </div>
                 `);
                 lastDate = tweetDateStr;
             }
+
             renderTweet(tweet);
         });
     }
 
     function renderTweet(tweet) {
-        let escapedContent = escapeHtml(tweet.content);
-        let textContent = escapedContent.replace(/\n/g, '<br>');
-        let timeStr = formatTimeStr(tweet.createdAt);
+        const textContent = escapeHtml(tweet.content).replace(/\n/g, '<br>');
+        const timeStr = formatTimeStr(tweet.createdAt);
+        const tags = tweet.tags || [];
+        const imageHtml = tweet.imageFile
+            ? `<img src="uploads/${tweet.imageFile}" class="tweetImage" alt="投稿画像" onload="adjustScroll()" loading="lazy">`
+            : '';
 
-        let imageHtml = '';
-        if (tweet.imageFile) {
-            imageHtml = `<img src="uploads/${tweet.imageFile}" class="tweetImage" alt="uploaded image" onload="adjustScroll()" loading="lazy">`;
-        }
-
-        let tagsHtml = '';
-        if (!tweet.tags) tweet.tags = [];
-
-        let tagsSection = '';
-        tweet.tags.forEach(function (tagName) {
-            tagsHtml += `<span class="tagBadge">#${escapeHtml(tagName)}<button class="removeTagBtn" data-tweet-id="${tweet.id}" data-tag-name="${escapeHtml(tagName)}" title="タグ削除">&times;</button></span>`;
-        });
-        let tagDropdownHtml = generateTagSelectHtml(tweet.id, tweet.tags);
-        tagsSection = `
-                <div class="tagsRow" id="tags-container-${tweet.id}">
-                    <div class="tagsContainer">
-                        ${tagsHtml}
-                        ${tagDropdownHtml}
-                    </div>
-                </div>`;
-
-        let html = `
+        $('#chatFeed').append(`
             <div class="tweet" data-id="${tweet.id}" id="tweet-${tweet.id}">
                 <div class="tweetBubble">
-                    ${textContent}
+                    <div class="tweetActions">
+                        <button class="tweetMenuBtn" type="button" title="メニュー"><i class="fas fa-ellipsis-h"></i></button>
+                        <div class="tweetMenu">
+                            <button class="deleteBtn" type="button" data-id="${tweet.id}"><i class="fas fa-trash"></i> 削除</button>
+                        </div>
+                    </div>
+                    <div class="tweetContent">${textContent}</div>
                     ${imageHtml}
-                    ${tagsSection}
+                    <div class="tagsRow" id="tags-container-${tweet.id}">
+                        <div class="tagsContainer">
+                            ${tagsHtml(tweet.id, tags)}
+                            ${generateTagSelectHtml(tweet.id, tags)}
+                        </div>
+                    </div>
                     <div class="tweetMeta">
                         <span class="tweetTime">${timeStr}</span>
-                        <button class="deleteBtn" data-id="${tweet.id}" title="削除"><i class="fas fa-trash"></i> 削除</button>
                     </div>
                 </div>
             </div>
+        `);
+    }
+
+    function updateTweetTags(tweetId, tags) {
+        const tweetObj = loadedTweets.find(function (tweet) {
+            return String(tweet.id) === String(tweetId);
+        });
+        if (tweetObj) {
+            tweetObj.tags = tags;
+        }
+
+        $('#tags-container-' + tweetId + ' .tagsContainer').html(
+            tagsHtml(tweetId, tags) + generateTagSelectHtml(tweetId, tags)
+        );
+    }
+
+    function tagsHtml(tweetId, tags) {
+        return tags.map(function (tagName) {
+            const escapedName = escapeHtml(tagName);
+            return `<span class="tagBadge">#${escapedName}<button class="removeTagBtn" data-tweet-id="${tweetId}" data-tag-name="${escapedName}" title="タグ削除">&times;</button></span>`;
+        }).join('');
+    }
+
+    function generateTagSelectHtml(tweetId, currentTags) {
+        let optionsHtml = '<option value="">+</option>';
+        let addedCount = 0;
+
+        allTags.forEach(function (tag) {
+            if (!currentTags.includes(tag.name)) {
+                optionsHtml += `<option value="${tag.id}">${escapeHtml(tag.name)}</option>`;
+                addedCount++;
+            }
+        });
+
+        if (addedCount === 0) {
+            return '';
+        }
+
+        return `
+            <div class="addTagWrap">
+                <select class="addTagSelect" data-tweet-id="${tweetId}" title="タグを追加">
+                    ${optionsHtml}
+                </select>
+            </div>
         `;
-        $('#chatFeed').append(html);
+    }
+
+    function addComposerTag(rawTag) {
+        const normalizedTags = String(rawTag || '')
+            .replace(/,/g, ' ')
+            .split(/\s+/)
+            .map(function (tag) {
+                return tag.trim().replace(/^#/, '');
+            })
+            .filter(Boolean);
+
+        normalizedTags.forEach(function (tag) {
+            if (!selectedTags.includes(tag)) {
+                selectedTags.push(tag);
+            }
+        });
+
+        renderComposerTags();
+    }
+
+    function renderComposerTags() {
+        $('#composerTagChips').html(selectedTags.map(function (tag) {
+            const escapedTag = escapeHtml(tag);
+            return `<span class="composerTagChip">#${escapedTag}<button type="button" class="composerTagRemove" data-tag-name="${escapedTag}" title="タグを外す">&times;</button></span>`;
+        }).join(''));
+
+        syncTagsInput();
+    }
+
+    function syncTagsInput() {
+        $('#tagsHiddenInput').val(selectedTags.join(' '));
+    }
+
+    function renderTagSuggestions() {
+        const suggestionHtml = allTags.slice(0, 10).map(function (tag) {
+            return `<button type="button" class="tagSuggestionBtn" data-tag-name="${escapeHtml(tag.name)}">#${escapeHtml(tag.name)}</button>`;
+        }).join('');
+
+        $('#tagSuggestions').html(suggestionHtml).toggle(suggestionHtml !== '');
+    }
+
+    function checkSubmitState() {
+        const hasText = $('#tweetText').val().trim().length > 0;
+        const hasImage = $('#imageUpload').val() !== '';
+        $('#submitBtn').prop('disabled', !(hasText || hasImage));
+    }
+
+    function resetComposer() {
+        selectedTags = [];
+        renderComposerTags();
+        $('#tweetText').val('').css('height', '46px');
+        $('#tagsInput').val('');
+        $('#imageUpload').val('');
+        $('#imagePreview').attr('src', '');
+        $('#imagePreviewContainer').hide();
+        checkSubmitState();
+    }
+
+    function scrollToBottom() {
+        const chatFeed = $('#chatFeed')[0];
+        chatFeed.scrollTop = chatFeed.scrollHeight;
+    }
+
+    function loadMoreButtonHtml() {
+        return `
+            <div class="loadMoreBtnWrap">
+                <button class="loadMoreBtn" onclick="triggerLoadMore()">さらに過去の記録を読み込む</button>
+            </div>
+        `;
+    }
+
+    function toYmd(date) {
+        return date.getFullYear() + '-' + pad2(date.getMonth() + 1) + '-' + pad2(date.getDate());
+    }
+
+    function parseYmd(ymd) {
+        const parts = ymd.split('-').map(Number);
+        return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+
+    function formatYmdText(ymd) {
+        const date = parseYmd(ymd);
+        return date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日';
+    }
+
+    function formatTimeStr(isoString) {
+        const parts = isoString.split(' ');
+        if (parts.length < 2) {
+            return '';
+        }
+
+        const timeParts = parts[1].split(':');
+        return parseInt(timeParts[0], 10) + '時' + timeParts[1] + '分';
+    }
+
+    function pad2(value) {
+        return ('0' + value).slice(-2);
     }
 
     function escapeHtml(text) {
         return $('<div>').text(text).html();
     }
-
-    function scrollToBottom() {
-        let chatFeed = $('#chatFeed')[0];
-        chatFeed.scrollTop = chatFeed.scrollHeight;
-    }
-    window.adjustScroll = function () {
-        let chatFeed = $('#chatFeed')[0];
-        // 500px以内なら下へスクロール（過去分追加時に画像がロードされても飛ばないようにするため）
-        if (chatFeed.scrollTop + chatFeed.clientHeight >= chatFeed.scrollHeight - 500) {
-            chatFeed.scrollTop = chatFeed.scrollHeight;
-        }
-    };
-
-    // Auto-load more when scrolling to top
-    $('#chatFeed').on('scroll', function () {
-        if ($(this).scrollTop() === 0 && hasMore && !isLoading && loadedTweets.length > 0) {
-            loadTweets(true);
-        }
-    });
-
-    $('#tweetText').on('input', function () {
-        checkSubmitState();
-        $(this).css('height', '46px');
-        $(this).css('height', Math.min(this.scrollHeight, 150) + 'px');
-    });
-
-    $('#tweetText').on('keydown', function (e) {
-        let isPC = window.matchMedia("(any-hover: hover)").matches;
-        if (isPC && e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            if (!$('#submitBtn').prop('disabled')) {
-                $('#tweetForm').submit();
-            }
-        }
-    });
-
-    $('#imageUpload').change(function () {
-        if (this.files && this.files[0]) {
-            let reader = new FileReader();
-            reader.onload = function (e) {
-                $('#imagePreview').attr('src', e.target.result);
-                $('#imagePreviewContainer').show();
-                checkSubmitState();
-            }
-            reader.readAsDataURL(this.files[0]);
-        }
-    });
-
-    $('#removeImageBtn').click(function () {
-        $('#imageUpload').val('');
-        $('#imagePreview').attr('src', '');
-        $('#imagePreviewContainer').hide();
-        checkSubmitState();
-    });
-
-    $('#tagsInput').on('input', function () {
-        checkSubmitState();
-    });
-
-    function checkSubmitState() {
-        let hasText = $('#tweetText').val().trim().length > 0;
-        let hasImage = $('#imageUpload').val() !== '';
-        $('#submitBtn').prop('disabled', !(hasText || hasImage));
-    }
-
-    $('#tweetForm').submit(function (e) {
-        e.preventDefault();
-        let formData = new FormData(this);
-        $('#submitBtn').prop('disabled', true);
-
-        $.ajax({
-            url: 'api/postTweet.php',
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function (response) {
-                if (response.success && response.tweet) {
-                    // Update top local state
-                    loadedTweets.push(response.tweet);
-
-                    renderAllTweets();
-                    scrollToBottom();
-
-                    $('#tweetText').val('').css('height', '46px');
-                    $('#tagsInput').val('');
-                    $('#imageUpload').val('');
-                    $('#imagePreviewContainer').hide();
-
-                    fetchAllTags();
-                } else {
-                    alert('投稿に失敗しました: ' + (response.error || '不明なエラー'));
-                    checkSubmitState();
-                }
-            },
-            error: function (xhr) {
-                alert('通信エラーが発生しました。');
-                checkSubmitState();
-            }
-        });
-    });
-
-    $('#chatFeed').on('click', '.deleteBtn', function () {
-        let tweetId = $(this).data('id');
-        if (confirm("この記録を削除しますか？")) {
-            $.ajax({
-                url: 'api/deleteTweet.php',
-                method: 'POST',
-                data: { tweetId: tweetId },
-                dataType: 'json',
-                success: function (response) {
-                    if (response.success) {
-                        $('#tweet-' + tweetId).fadeOut(300, function () {
-                            $(this).remove();
-                            // Update local array
-                            loadedTweets = loadedTweets.filter(t => t.id !== tweetId);
-                        });
-                    } else {
-                        alert('削除に失敗しました: ' + (response.error || '不明なエラー'));
-                    }
-                },
-                error: function () {
-                    alert('通信エラーが発生しました。');
-                }
-            });
-        }
-    });
-
-    $('#chatFeed').on('change', '.addTagSelect', function () {
-        let tagId = $(this).val();
-        let tweetId = $(this).data('tweet-id');
-        let $select = $(this);
-
-        if (!tagId) return;
-        $select.prop('disabled', true);
-
-        $.ajax({
-            url: 'api/addTagToTweet.php',
-            method: 'POST',
-            data: { tweetId: tweetId, tagId: tagId },
-            dataType: 'json',
-            success: function (response) {
-                if (response.success && response.tags) {
-                    // Update array element
-                    let tweetObj = loadedTweets.find(t => t.id === tweetId);
-                    if (tweetObj) tweetObj.tags = response.tags;
-
-                    let tagsHtml = '';
-                    response.tags.forEach(function (tagName) {
-                        tagsHtml += `<span class="tagBadge">#${escapeHtml(tagName)}<button class="removeTagBtn" data-tweet-id="${tweetId}" data-tag-name="${escapeHtml(tagName)}" title="タグ削除">&times;</button></span>`;
-                    });
-
-                    let tagDropdownHtml = generateTagSelectHtml(tweetId, response.tags);
-                    $('#tags-container-' + tweetId + ' .tagsContainer').html(tagsHtml + tagDropdownHtml);
-                } else {
-                    alert('タグの追加に失敗しました。');
-                    $select.prop('disabled', false).val('');
-                }
-            },
-            error: function () {
-                alert('通信エラーが発生しました。');
-                $select.prop('disabled', false).val('');
-            }
-        });
-    });
-
-    $('#chatFeed').on('click', '.removeTagBtn', function () {
-        let tweetId = $(this).data('tweet-id');
-        let tagName = $(this).data('tag-name');
-        let $btn = $(this);
-
-        $btn.prop('disabled', true);
-
-        $.ajax({
-            url: 'api/removeTagFromTweet.php',
-            method: 'POST',
-            data: { tweetId: tweetId, tagName: tagName },
-            dataType: 'json',
-            success: function (response) {
-                if (response.success && response.tags) {
-                    let tweetObj = loadedTweets.find(t => t.id === tweetId);
-                    if (tweetObj) tweetObj.tags = response.tags;
-
-                    let tagsHtml = '';
-                    response.tags.forEach(function (tName) {
-                        tagsHtml += `<span class="tagBadge">#${escapeHtml(tName)}<button class="removeTagBtn" data-tweet-id="${tweetId}" data-tag-name="${escapeHtml(tName)}" title="タグ削除">&times;</button></span>`;
-                    });
-                    let tagDropdownHtml = generateTagSelectHtml(tweetId, response.tags);
-                    $('#tags-container-' + tweetId + ' .tagsContainer').html(tagsHtml + tagDropdownHtml);
-                } else {
-                    alert('タグの削除に失敗しました。');
-                    $btn.prop('disabled', false);
-                }
-            },
-            error: function () {
-                alert('通信エラーが発生しました。');
-                $btn.prop('disabled', false);
-            }
-        });
-    });
-
-    // Image Modal Logic
-    $('#chatFeed').on('click', '.tweetImage', function() {
-        $('#modalImage').attr('src', $(this).attr('src'));
-        $('#imageModal').css('display', 'flex').hide().fadeIn(200);
-    });
-
-    $('#imageModal').click(function(e) {
-        if (e.target !== $('#modalImage')[0]) {
-            $(this).fadeOut(200);
-        }
-    });
-
-    $('.closeModalBtn').click(function() {
-        $('#imageModal').fadeOut(200);
-    });
 });

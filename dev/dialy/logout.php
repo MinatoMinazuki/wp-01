@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__.'/class/DBC.php';
+require_once __DIR__.'/includes/helpers.php';
 session_start();
 
 $dbc = new DBC();
@@ -7,15 +8,14 @@ $dbc = new DBC();
 if( isset($_COOKIE['autoLoginToken']) ){
     $token = $_COOKIE['autoLoginToken'];
 
-    $sql = sprintf("
+    $dbc->execute("
         DELETE FROM
         login_tokens
-        WHERE token = '%s'
+        WHERE token = :token
         ",
-        $dbc->escape($token)
+        ['token' => $token]
     );
 
-    $dbc->Dsql($sql);
     setcookie('autoLoginToken', '', time() - 3600, '/');
 }
 

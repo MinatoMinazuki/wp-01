@@ -1,59 +1,67 @@
 <?php
-require_once __DIR__.'/../auth.php';
+require_once __DIR__ . '/../auth.php';
 header('Content-Type: application/json; charset=utf-8');
+
+require_post();
+require_csrf();
 
 $userId = (int)$_SESSION['userId'];
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['error' => 'Invalid request method.']);
-    exit;
-}
-
 $tweetId = isset($_POST['tweetId']) ? (int)$_POST['tweetId'] : 0;
-$tagName = isset($_POST['tagName']) ? trim($_POST['tagName']) : '';
+$tagName = isset($_POST['tagName']) ? trim((string)$_POST['tagName']) : '';
 
 if ($tweetId <= 0 || $tagName === '') {
     echo json_encode(['error' => 'Invalid parameters.']);
     exit;
 }
 
-// Ensure the tweet belongs to the user and is not deleted
-$checkSql = "SELECT `id` FROM tweets WHERE `id` = {$tweetId} AND `user_id` = {$userId} AND `is_deleted` = 0";
-$checkRes = $dbc->Dsql($checkSql);
-if ($checkRes === false || count($checkRes) === 0) {
-    echo json_encode(['error' => 'ツイートが見つからないか、権限がありません。']);
+$tweet = $dbc->fetchOne(
+    "
+    SELECT id
+    FROM tweets
+    WHERE id = :tweet_id
+      AND user_id = :user_id
+      AND is_deleted = 0
+    ",
+    [
+        'tweet_id' => $tweetId,
+        'user_id' => $userId,
+    ]
+);
+
+if ($tweet === null) {
+    echo json_encode(['error' => 'Tweet not found or not authorized.']);
     exit;
 }
 
-$escapedTagName = $dbc->escape($tagName);
+$tag = $dbc->fetchOne(
+    "SELECT id FROM tags WHERE name = :name",
+    ['name' => $tagName]
+);
 
-// Find the tag ID
-$tagSql = "SELECT `id` FROM tags WHERE `name` = '{$escapedTagName}'";
-$tagRes = $dbc->Dsql($tagSql);
-
-if ($tagRes && count($tagRes) > 0) {
-    $tagId = (int)$tagRes[0]['id'];
-
-    // Delete relation
-    $delSql = "DELETE FROM tweet_tags WHERE `tweet_id` = {$tweetId} AND `tag_id` = {$tagId}";
-    $dbc->Dsql($delSql);
+if ($tag !== null) {
+    $dbc->execute(
+        "
+        DELETE FROM tweet_tags
+        WHERE tweet_id = :tweet_id
+          AND tag_id = :tag_id
+        ",
+        [
+            'tweet_id' => $tweetId,
+            'tag_id' => (int)$tag['id'],
+        ]
+    );
 }
 
-// Fetch remaining tags for the tweet
-$remainingSql = "
-    SELECT tg.`name`
-    FROM tweet_tags tt
-    INNER JOIN tags tg ON tt.`tag_id` = tg.`id`
-    WHERE tt.`tweet_id` = {$tweetId}
-";
-$remainingRes = $dbc->Dsql($remainingSql);
+$remainingTags = $dbc->fetchAll(
+    "
+    SELECT tg.name
+    FROM tweet_tags AS tt
+    INNER JOIN tags AS tg ON tt.tag_id = tg.id
+    WHERE tt.tweet_id = :tweet_id
+    ORDER BY tg.id ASC
+    ",
+    ['tweet_id' => $tweetId]
+);
 
-$tags = [];
-if (is_array($remainingRes)) {
-    foreach ($remainingRes as $row) {
-        $tags[] = $row['name'];
-    }
-}
-
-echo json_encode(['success' => true, 'tags' => $tags]);
-?>
+echo json_encode(['success' => true, 'tags' => array_column($remainingTags, 'name')]);
