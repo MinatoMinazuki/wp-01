@@ -40,6 +40,10 @@ $(function () {
         shiftDate(1);
     });
 
+    $('#todayBtn').on('click', function () {
+        setCurrentDate(toYmd(new Date()), true);
+    });
+
     $('#calendarInput').on('change', function () {
         if (this.value) {
             setCurrentDate(this.value, true);
@@ -59,6 +63,7 @@ $(function () {
             e.preventDefault();
             currentSearch = $(this).val().trim();
             $('#searchClearBtn').toggle(currentSearch !== '');
+            renderSearchStatus();
             loadTweets(false);
         }
     });
@@ -67,6 +72,7 @@ $(function () {
         $('#searchInput').val('');
         currentSearch = '';
         $(this).hide();
+        renderSearchStatus();
         loadTweets(false);
     });
 
@@ -176,6 +182,7 @@ $(function () {
                     scrollToBottom();
                     resetComposer();
                     fetchAllTags(renderTagSuggestions);
+                    showToast('保存しました');
                 } else {
                     alert('投稿に失敗しました: ' + (response.error || '不明なエラー'));
                     checkSubmitState();
@@ -229,6 +236,37 @@ $(function () {
                 alert('通信エラーが発生しました。');
             }
         });
+    });
+
+    $('#chatFeed').on('click', '.copyTweetBtn', function (e) {
+        e.stopPropagation();
+        const tweetId = $(this).data('id');
+        const tweet = loadedTweets.find(function (item) {
+            return String(item.id) === String(tweetId);
+        });
+        $('.tweetMenu').removeClass('isOpen');
+        if (tweet) {
+            copyText(tweet.content || '');
+        }
+    });
+
+    $('#chatFeed').on('click', '.openImageBtn', function (e) {
+        e.stopPropagation();
+        const tweetId = $(this).data('id');
+        const tweet = loadedTweets.find(function (item) {
+            return String(item.id) === String(tweetId);
+        });
+        $('.tweetMenu').removeClass('isOpen');
+        if (tweet && tweet.imageFile) {
+            $('#modalImage').attr('src', 'uploads/' + tweet.imageFile);
+            $('#imageModal').css('display', 'flex').hide().fadeIn(200);
+        }
+    });
+
+    $('#chatFeed').on('click', '.focusTagBtn', function (e) {
+        e.stopPropagation();
+        $('.tweetMenu').removeClass('isOpen');
+        $('#tagsInput').trigger('focus');
     });
 
     $('#chatFeed').on('change', '.addTagSelect', function () {
@@ -326,6 +364,7 @@ $(function () {
         currentSearch = '';
         $('#searchClearBtn').hide();
         $('#searchBarContainer').slideUp(200);
+        renderSearchStatus();
     }
 
     function fetchAllTags(callback) {
@@ -470,6 +509,9 @@ $(function () {
                     <div class="tweetActions">
                         <button class="tweetMenuBtn" type="button" title="メニュー"><i class="fas fa-ellipsis-h"></i></button>
                         <div class="tweetMenu">
+                            <button class="copyTweetBtn" type="button" data-id="${tweet.id}"><i class="fas fa-copy"></i> 本文をコピー</button>
+                            ${tweet.imageFile ? `<button class="openImageBtn" type="button" data-id="${tweet.id}"><i class="fas fa-image"></i> 画像を開く</button>` : ''}
+                            <button class="focusTagBtn" type="button"><i class="fas fa-tags"></i> タグを入力</button>
                             <button class="deleteBtn" type="button" data-id="${tweet.id}"><i class="fas fa-trash"></i> 削除</button>
                         </div>
                     </div>
@@ -572,6 +614,20 @@ $(function () {
         $('#tagSuggestions').html(suggestionHtml).toggle(suggestionHtml !== '');
     }
 
+    function renderSearchStatus() {
+        const $status = $('#searchStatus');
+        if (currentSearch === '') {
+            $status.empty().hide();
+            return;
+        }
+
+        $status.html(`<span class="searchChip">検索: ${escapeHtml(currentSearch)} <button type="button" id="searchStatusClear" title="検索をクリア">&times;</button></span>`).show();
+    }
+
+    $('#searchStatus').on('click', '#searchStatusClear', function () {
+        $('#searchClearBtn').trigger('click');
+    });
+
     function checkSubmitState() {
         const hasText = $('#tweetText').val().trim().length > 0;
         const hasImage = $('#imageUpload').val() !== '';
@@ -592,6 +648,49 @@ $(function () {
     function scrollToBottom() {
         const chatFeed = $('#chatFeed')[0];
         chatFeed.scrollTop = chatFeed.scrollHeight;
+    }
+
+    function showToast(message) {
+        const $toast = $('#toast');
+        $toast.text(message).addClass('isVisible');
+        clearTimeout($toast.data('timer'));
+        $toast.data('timer', setTimeout(function () {
+            $toast.removeClass('isVisible');
+        }, 1800));
+    }
+
+    function copyText(text) {
+        if (!text) {
+            showToast('コピーする本文がありません');
+            return;
+        }
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function () {
+                showToast('本文をコピーしました');
+            }).catch(function () {
+                fallbackCopyText(text);
+            });
+        } else {
+            fallbackCopyText(text);
+        }
+    }
+
+    function fallbackCopyText(text) {
+        const $temp = $('<textarea>').val(text).css({
+            position: 'fixed',
+            left: '-9999px',
+            top: '0'
+        });
+        $('body').append($temp);
+        $temp[0].select();
+        try {
+            document.execCommand('copy');
+            showToast('本文をコピーしました');
+        } catch (e) {
+            showToast('コピーに失敗しました');
+        }
+        $temp.remove();
     }
 
     function loadMoreButtonHtml() {

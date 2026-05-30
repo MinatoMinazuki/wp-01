@@ -11,13 +11,16 @@ class DBC
     try{
       $this->dbh = new PDO($dsn, USER, PASS);
     } catch(Exception $e) {
-      exit($e->getMessage());
+      error_log('Database connection failed: ' . $e->getMessage());
+      http_response_code(500);
+      exit('Database connection failed.');
     }
 
     $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $this->dbh->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
   }
 
+  /** @deprecated Use fetchAll() with bound parameters instead. */
   public function select($sql){
     $stmt = $this->dbh->query($sql);
     $items = $stmt->fetchAll();
@@ -57,6 +60,7 @@ class DBC
     return $this->dbh->lastInsertId();
   }
 
+  /** @deprecated Use fetchAll(), fetchOne(), execute(), or insert() instead. */
   public function Dsql($sql){
     try {
         $stmt = $this->dbh->prepare($sql);
@@ -91,6 +95,25 @@ class DBC
     if ($str === null) return '';
     $quoted = $this->dbh->quote($str);
     return substr($quoted, 1, -1);
+  }
+
+  public function columnExists(string $table, string $column): bool
+  {
+    $row = $this->fetchOne(
+      "
+      SELECT COUNT(*) AS cnt
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = :table_name
+        AND COLUMN_NAME = :column_name
+      ",
+      [
+        'table_name' => $table,
+        'column_name' => $column,
+      ]
+    );
+
+    return $row !== null && (int)$row['cnt'] > 0;
   }
 }
 ?>

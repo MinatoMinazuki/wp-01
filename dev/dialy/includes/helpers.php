@@ -70,7 +70,52 @@ function create_login_token(DBC $dbc, int $userId): string
         ]
     );
 
-    setcookie('autoLoginToken', $token, $expiresTime, '/', '', false, true);
+    set_secure_cookie('autoLoginToken', $token, $expiresTime);
 
     return $token;
+}
+
+function set_secure_cookie(string $name, string $value, int $expires): void
+{
+    setcookie($name, $value, [
+        'expires' => $expires,
+        'path' => '/',
+        'secure' => is_https_request(),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+function clear_secure_cookie(string $name): void
+{
+    set_secure_cookie($name, '', time() - 3600);
+}
+
+function is_https_request(): bool
+{
+    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        return true;
+    }
+
+    return isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https';
+}
+
+function tags_have_user_id(DBC $dbc): bool
+{
+    static $hasUserId = null;
+
+    if ($hasUserId === null) {
+        $hasUserId = $dbc->columnExists('tags', 'user_id');
+    }
+
+    return $hasUserId;
+}
+
+function tag_owner_condition(DBC $dbc, string $alias = 'tg'): string
+{
+    if (!tags_have_user_id($dbc)) {
+        return '';
+    }
+
+    return " AND {$alias}.user_id = :tag_user_id";
 }

@@ -16,7 +16,7 @@ if( isset($_COOKIE['autoLoginToken']) ){
         ['token' => $token]
     );
 
-    setcookie('autoLoginToken', '', time() - 3600, '/');
+    clear_secure_cookie('autoLoginToken');
 }
 
 $_SESSION = array();

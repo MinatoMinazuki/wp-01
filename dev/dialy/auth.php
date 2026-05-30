@@ -34,13 +34,13 @@ if ($userId === null && $token !== null) {
                 ",
                 ['token' => $token]
             );
-            setcookie('autoLoginToken', '', time() - 3600, '/');
+            clear_secure_cookie('autoLoginToken');
         }
     }
 }
 
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
-$publicPages = ['login.php', 'setupUser.php'];
+$publicPages = ['login.php'];
 
 if (!isset($_SESSION['userId']) && !in_array($currentPage, $publicPages)) {
     header('Location: login.php');

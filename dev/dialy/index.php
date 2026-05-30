@@ -24,6 +24,7 @@ $csrfToken = csrf_token();
             <div class="headerTitle">Diary</div>
             <div class="headerRight">
                 <button id="searchToggleBtn" title="検索" class="searchToggleBtn"><i class="fas fa-search"></i></button>
+                <button id="todayBtn" title="今日へ戻る" class="todayBtn" type="button">今日</button>
                 <span id="currentDateDisplay">Today</span>
                 <a href="logout.php" class="logoutBtn" title="ログアウト"><i class="fas fa-sign-out-alt"></i></a>
             </div>
@@ -34,6 +35,7 @@ $csrfToken = csrf_token();
                 <input type="text" id="searchInput" class="searchInput" placeholder="キーワードまたはタグで検索..." autocomplete="off">
                 <button id="searchClearBtn" class="searchClearBtn" title="検索をクリア"><i class="fas fa-times"></i></button>
             </div>
+            <div id="searchStatus" class="searchStatus"></div>
         </div>
 
         <main class="chatFeed" id="chatFeed">
@@ -75,6 +77,8 @@ $csrfToken = csrf_token();
         <span class="closeModalBtn">&times;</span>
         <img class="imageModalContent" id="modalImage" alt="拡大画像">
     </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/main.js"></script>

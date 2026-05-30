@@ -246,6 +246,23 @@ body {
     color: #f4eee2;
 }
 
+.todayBtn {
+    border: 1px solid rgba(244, 238, 226, 0.45);
+    background: rgba(255, 255, 255, 0.08);
+    color: #f4eee2;
+    border-radius: 14px;
+    padding: 4px 9px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.todayBtn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(244, 238, 226, 0.8);
+}
+
 .searchBarContainer {
     display: none;
     background: #fdfaf4;
@@ -288,6 +305,36 @@ body {
 
 .searchClearBtn:hover {
     color: #8c6239;
+}
+
+.searchStatus {
+    display: none;
+    margin-top: 8px;
+}
+
+.searchChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f4eee2;
+    color: #6b4c3a;
+    border: 1px solid #dcd3be;
+    border-radius: 16px;
+    padding: 5px 8px 5px 10px;
+    font-size: 12px;
+}
+
+#searchStatusClear {
+    border: none;
+    background: rgba(107, 76, 58, 0.12);
+    color: #6b4c3a;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Feed Area (Diary view) */
@@ -416,7 +463,7 @@ body {
     color: #8e6d55;
 }
 
-.deleteBtn {
+.tweetMenu button {
     width: 100%;
     background: none;
     border: none;
@@ -432,7 +479,12 @@ body {
     text-align: left;
 }
 
-.deleteBtn:hover {
+.tweetMenu button:hover {
+    background: #f4eee2;
+    color: #6b4c3a;
+}
+
+.tweetMenu .deleteBtn:hover {
     background: #fcf1f1;
     color: #e74c3c;
 }
@@ -731,13 +783,17 @@ body {
     position: relative;
     margin-top: 12px;
     display: none;
+    width: 96px;
+    height: 96px;
 }
 
 #imagePreview {
-    max-height: 120px;
+    width: 100%;
+    height: 100%;
     border-radius: 6px;
     border: 1px solid #dcd3be;
-    object-fit: contain;
+    object-fit: cover;
+    background: #fdfaf4;
 }
 
 #removeImageBtn {
@@ -871,6 +927,28 @@ body {
 .closeModalBtn:hover, .closeModalBtn:focus {
     color: #bbb;
     text-decoration: none;
+}
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translate(-50%, 16px);
+    background: rgba(74, 60, 49, 0.94);
+    color: #fffdf9;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 10001;
+    box-shadow: 0 8px 20px rgba(74, 60, 49, 0.22);
+}
+
+.toast.isVisible {
+    opacity: 1;
+    transform: translate(-50%, 0);
 }
 
 /* Copy button in auth forms */

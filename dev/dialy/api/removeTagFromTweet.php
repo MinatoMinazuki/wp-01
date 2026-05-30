@@ -1,18 +1,15 @@
 <?php
-require_once __DIR__ . '/../auth.php';
-header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/bootstrap.php';
 
 require_post();
 require_csrf();
 
-$userId = (int)$_SESSION['userId'];
-
+$userId = current_user_id();
 $tweetId = isset($_POST['tweetId']) ? (int)$_POST['tweetId'] : 0;
 $tagName = isset($_POST['tagName']) ? trim((string)$_POST['tagName']) : '';
 
 if ($tweetId <= 0 || $tagName === '') {
-    echo json_encode(['error' => 'Invalid parameters.']);
-    exit;
+    json_response(['error' => 'Invalid parameters.'], 400);
 }
 
 $tweet = $dbc->fetchOne(
@@ -30,13 +27,19 @@ $tweet = $dbc->fetchOne(
 );
 
 if ($tweet === null) {
-    echo json_encode(['error' => 'Tweet not found or not authorized.']);
-    exit;
+    json_response(['error' => 'Tweet not found or not authorized.'], 404);
+}
+
+$tagParams = ['name' => $tagName];
+$tagOwnerSql = '';
+if (tags_have_user_id($dbc)) {
+    $tagOwnerSql = ' AND user_id = :user_id';
+    $tagParams['user_id'] = $userId;
 }
 
 $tag = $dbc->fetchOne(
-    "SELECT id FROM tags WHERE name = :name",
-    ['name' => $tagName]
+    "SELECT id FROM tags WHERE name = :name{$tagOwnerSql}",
+    $tagParams
 );
 
 if ($tag !== null) {
@@ -53,15 +56,19 @@ if ($tag !== null) {
     );
 }
 
+$ownerJoinCondition = tags_have_user_id($dbc) ? ' AND tg.user_id = :user_id' : '';
 $remainingTags = $dbc->fetchAll(
     "
     SELECT tg.name
     FROM tweet_tags AS tt
     INNER JOIN tags AS tg ON tt.tag_id = tg.id
     WHERE tt.tweet_id = :tweet_id
+    {$ownerJoinCondition}
     ORDER BY tg.id ASC
     ",
-    ['tweet_id' => $tweetId]
+    tags_have_user_id($dbc)
+        ? ['tweet_id' => $tweetId, 'user_id' => $userId]
+        : ['tweet_id' => $tweetId]
 );
 
-echo json_encode(['success' => true, 'tags' => array_column($remainingTags, 'name')]);
+json_response(['success' => true, 'tags' => array_column($remainingTags, 'name')]);

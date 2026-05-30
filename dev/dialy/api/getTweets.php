@@ -1,9 +1,7 @@
 <?php
-require_once __DIR__ . '/../auth.php';
+require_once __DIR__ . '/bootstrap.php';
 
-header('Content-Type: application/json; charset=utf-8');
-
-$userId = (int)$_SESSION['userId'];
+$userId = current_user_id();
 $dateParam = isset($_GET['date']) ? trim((string)$_GET['date']) : null;
 $beforeId = isset($_GET['before_id']) ? (int)$_GET['before_id'] : 0;
 $beforeDate = isset($_GET['before_date']) ? trim((string)$_GET['before_date']) : null;
@@ -40,15 +38,13 @@ if ($beforeId > 0) {
     $params['before_id'] = $beforeId;
 } elseif ($beforeDate !== null && $beforeDate !== '') {
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $beforeDate)) {
-        echo json_encode(['error' => 'Invalid date format.']);
-        exit;
+        json_response(['error' => 'Invalid date format.'], 400);
     }
     $conditions[] = 't.created_at < :before_date_start';
     $params['before_date_start'] = $beforeDate . ' 00:00:00';
 } elseif ($dateParam !== null && $dateParam !== '') {
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateParam)) {
-        echo json_encode(['error' => 'Invalid date format.']);
-        exit;
+        json_response(['error' => 'Invalid date format.'], 400);
     }
     $conditions[] = 't.created_at >= :date_start';
     $conditions[] = 't.created_at < :date_end';
@@ -118,4 +114,4 @@ if (count($formattedTweets) > 0) {
     $hasMore = $olderTweet !== null;
 }
 
-echo json_encode(['success' => true, 'tweets' => $formattedTweets, 'hasMore' => $hasMore]);
+json_response(['success' => true, 'tweets' => $formattedTweets, 'hasMore' => $hasMore]);

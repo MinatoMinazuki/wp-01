@@ -1,6 +1,9 @@
 <?php
-require_once __DIR__ . '/../auth.php';
-header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/bootstrap.php';
+
+$hasTagOwner = tags_have_user_id($dbc);
+$ownerSelect = $hasTagOwner ? 'tg.user_id = :user_id' : 't.user_id = :user_id';
+$params = ['user_id' => current_user_id()];
 
 $tags = $dbc->fetchAll(
     "
@@ -10,11 +13,11 @@ $tags = $dbc->fetchAll(
     FROM tags AS tg
     INNER JOIN tweet_tags AS tt ON tt.tag_id = tg.id
     INNER JOIN tweets AS t ON t.id = tt.tweet_id
-    WHERE t.user_id = :user_id
+    WHERE {$ownerSelect}
       AND t.is_deleted = 0
     ORDER BY tg.created_at DESC
     ",
-    ['user_id' => current_user_id()]
+    $params
 );
 
-echo json_encode(['success' => true, 'tags' => $tags]);
+json_response(['success' => true, 'tags' => $tags]);
