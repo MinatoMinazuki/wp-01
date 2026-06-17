@@ -1,0 +1,1151 @@
+{
+  "meta": {
+    "title": "Roman territorial control, 753 BCE to 476 CE",
+    "range": {
+      "start": -753,
+      "end": 476
+    },
+    "bounds": {
+      "west": -12,
+      "east": 48,
+      "south": 24,
+      "north": 58
+    },
+    "notes": [
+      "This first dataset is an approximate educational model, not a survey-grade historical atlas.",
+      "Years use historical numbering: negative values are BCE, positive values are CE, and there is no year zero in the UI.",
+      "Regions are intentionally coarse so the simulator can run year-by-year while more precise GeoJSON is added later."
+    ]
+  },
+  "statuses": {
+    "core": {
+      "label": "中核",
+      "color": "#b83232"
+    },
+    "direct_control": {
+      "label": "直接支配",
+      "color": "#d45a3c"
+    },
+    "province": {
+      "label": "属州",
+      "color": "#d89a3d"
+    },
+    "client_state": {
+      "label": "従属・同盟",
+      "color": "#7aa65a"
+    },
+    "occupied": {
+      "label": "一時占領",
+      "color": "#9d6ac8"
+    },
+    "contested": {
+      "label": "係争・弱体化",
+      "color": "#6d91b3"
+    },
+    "lost": {
+      "label": "喪失",
+      "color": "#6e7681"
+    }
+  },
+  "regions": [
+    {
+      "id": "latium",
+      "name": "Latium and Rome",
+      "label": "ローマ",
+      "polygons": [
+        [
+          [11.8, 42.5],
+          [13.4, 42.4],
+          [13.4, 41.3],
+          [12.0, 41.0],
+          [11.5, 41.8]
+        ]
+      ],
+      "control": [
+        {
+          "start": -753,
+          "end": -510,
+          "controller": "Roman Kingdom",
+          "status": "core",
+          "confidence": "medium",
+          "note": "Traditional foundation-to-republic period."
+        },
+        {
+          "start": -509,
+          "end": -28,
+          "controller": "Roman Republic",
+          "status": "core",
+          "confidence": "high"
+        },
+        {
+          "start": -27,
+          "end": 394,
+          "controller": "Roman Empire",
+          "status": "core",
+          "confidence": "high"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Western Roman Empire",
+          "status": "core",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "id": "central_italy",
+      "name": "Central Italy",
+      "label": "中部イタリア",
+      "polygons": [
+        [
+          [9.8, 44.4],
+          [13.2, 44.5],
+          [14.9, 42.2],
+          [14.3, 40.8],
+          [12.0, 41.0],
+          [10.7, 42.5]
+        ]
+      ],
+      "control": [
+        {
+          "start": -338,
+          "end": -28,
+          "controller": "Roman Republic",
+          "status": "direct_control",
+          "confidence": "medium",
+          "note": "Represents the post-Latin War expansion across central Italy."
+        },
+        {
+          "start": -27,
+          "end": 394,
+          "controller": "Roman Empire",
+          "status": "core",
+          "confidence": "high"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Western Roman Empire",
+          "status": "core",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "id": "southern_italy",
+      "name": "Southern Italy",
+      "label": "南イタリア",
+      "polygons": [
+        [
+          [13.5, 42.2],
+          [16.8, 41.7],
+          [18.5, 39.6],
+          [17.0, 37.9],
+          [15.2, 39.0],
+          [14.0, 40.5]
+        ]
+      ],
+      "control": [
+        {
+          "start": -272,
+          "end": -28,
+          "controller": "Roman Republic",
+          "status": "direct_control",
+          "confidence": "medium",
+          "note": "After the defeat of Pyrrhus and the capture of Tarentum."
+        },
+        {
+          "start": -27,
+          "end": 394,
+          "controller": "Roman Empire",
+          "status": "core",
+          "confidence": "high"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Western Roman Empire",
+          "status": "core",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "id": "cisalpine_gaul",
+      "name": "Cisalpine Gaul",
+      "label": "北イタリア",
+      "polygons": [
+        [
+          [6.5, 46.2],
+          [13.5, 46.4],
+          [14.4, 44.5],
+          [10.0, 44.2],
+          [7.0, 44.6]
+        ]
+      ],
+      "control": [
+        {
+          "start": -191,
+          "end": -28,
+          "controller": "Roman Republic",
+          "status": "province",
+          "confidence": "medium"
+        },
+        {
+          "start": -27,
+          "end": 394,
+          "controller": "Roman Empire",
+          "status": "core",
+          "confidence": "high"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Western Roman Empire",
+          "status": "core",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "id": "sicily",
+      "name": "Sicily",
+      "label": "シチリア",
+      "polygons": [
+        [
+          [12.2, 38.3],
+          [15.8, 38.2],
+          [15.3, 36.7],
+          [12.5, 37.1]
+        ]
+      ],
+      "control": [
+        {
+          "start": -241,
+          "end": 394,
+          "controller": "Roman Republic / Empire",
+          "status": "province",
+          "confidence": "high",
+          "note": "Rome's first overseas province after the First Punic War."
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Western Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "sardinia_corsica",
+      "name": "Sardinia and Corsica",
+      "label": "サルデーニャ・コルシカ",
+      "polygons": [
+        [
+          [8.5, 42.9],
+          [9.7, 42.8],
+          [9.6, 41.4],
+          [8.6, 41.3]
+        ],
+        [
+          [8.0, 40.9],
+          [9.8, 40.6],
+          [9.7, 38.8],
+          [8.1, 38.8],
+          [7.8, 40.0]
+        ]
+      ],
+      "control": [
+        {
+          "start": -238,
+          "end": 454,
+          "controller": "Roman Republic / Empire",
+          "status": "province",
+          "confidence": "high"
+        },
+        {
+          "start": 455,
+          "end": 476,
+          "controller": "Vandal Kingdom",
+          "status": "lost",
+          "confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "hispania_coast",
+      "name": "Coastal Hispania",
+      "label": "ヒスパニア沿岸",
+      "polygons": [
+        [
+          [-3.0, 43.5],
+          [3.2, 42.7],
+          [1.7, 40.5],
+          [-1.0, 39.0],
+          [-3.0, 37.3],
+          [-6.0, 36.0],
+          [-7.0, 37.5],
+          [-5.0, 39.5],
+          [-4.0, 42.0]
+        ]
+      ],
+      "control": [
+        {
+          "start": -197,
+          "end": -20,
+          "controller": "Roman Republic",
+          "status": "province",
+          "confidence": "medium"
+        },
+        {
+          "start": -19,
+          "end": 408,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "high"
+        },
+        {
+          "start": 409,
+          "end": 476,
+          "controller": "Suebi, Vandals, Visigoths, and Roman remnants",
+          "status": "lost",
+          "confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "hispania_interior",
+      "name": "Interior Hispania",
+      "label": "ヒスパニア内陸",
+      "polygons": [
+        [
+          [-9.5, 43.7],
+          [-3.0, 43.6],
+          [1.7, 41.8],
+          [0.0, 38.8],
+          [-2.0, 36.8],
+          [-6.0, 36.5],
+          [-9.0, 38.8],
+          [-9.5, 42.0]
+        ]
+      ],
+      "control": [
+        {
+          "start": -19,
+          "end": 408,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "medium",
+          "note": "Represents consolidation after the Cantabrian Wars."
+        },
+        {
+          "start": 409,
+          "end": 476,
+          "controller": "Suebi, Vandals, Visigoths, and Roman remnants",
+          "status": "lost",
+          "confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "africa_proconsularis",
+      "name": "Africa Proconsularis",
+      "label": "アフリカ属州",
+      "polygons": [
+        [
+          [8.0, 37.3],
+          [12.2, 37.0],
+          [12.0, 33.2],
+          [8.0, 33.5],
+          [6.5, 35.3]
+        ]
+      ],
+      "control": [
+        {
+          "start": -146,
+          "end": 438,
+          "controller": "Roman Republic / Empire",
+          "status": "province",
+          "confidence": "high",
+          "note": "Created after the destruction of Carthage."
+        },
+        {
+          "start": 439,
+          "end": 476,
+          "controller": "Vandal Kingdom",
+          "status": "lost",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "id": "numidia",
+      "name": "Numidia",
+      "label": "ヌミディア",
+      "polygons": [
+        [
+          [2.0, 36.8],
+          [8.4, 37.0],
+          [8.0, 33.5],
+          [3.0, 33.2],
+          [1.4, 35.0]
+        ]
+      ],
+      "control": [
+        {
+          "start": -46,
+          "end": 428,
+          "controller": "Roman Republic / Empire",
+          "status": "province",
+          "confidence": "medium"
+        },
+        {
+          "start": 429,
+          "end": 476,
+          "controller": "Vandal Kingdom",
+          "status": "lost",
+          "confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "mauretania",
+      "name": "Mauretania",
+      "label": "マウレタニア",
+      "polygons": [
+        [
+          [-7.5, 36.5],
+          [2.4, 36.7],
+          [2.0, 34.2],
+          [-2.5, 33.0],
+          [-7.5, 34.0],
+          [-9.0, 35.3]
+        ]
+      ],
+      "control": [
+        {
+          "start": 44,
+          "end": 428,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        },
+        {
+          "start": 429,
+          "end": 476,
+          "controller": "Vandal Kingdom and local kingdoms",
+          "status": "lost",
+          "confidence": "low"
+        }
+      ]
+    },
+    {
+      "id": "macedonia_greece",
+      "name": "Macedonia and Greece",
+      "label": "ギリシア",
+      "polygons": [
+        [
+          [19.0, 41.8],
+          [23.0, 42.5],
+          [25.0, 41.0],
+          [24.0, 38.2],
+          [22.0, 36.1],
+          [19.5, 37.5],
+          [18.5, 40.0]
+        ]
+      ],
+      "control": [
+        {
+          "start": -146,
+          "end": 394,
+          "controller": "Roman Republic / Empire",
+          "status": "province",
+          "confidence": "high"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Eastern Roman Empire",
+          "status": "province",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "id": "asia_minor_west",
+      "name": "Asia Province",
+      "label": "小アジア西部",
+      "polygons": [
+        [
+          [26.0, 41.2],
+          [31.0, 41.6],
+          [32.0, 37.3],
+          [29.0, 36.3],
+          [26.0, 37.5],
+          [25.5, 39.5]
+        ]
+      ],
+      "control": [
+        {
+          "start": -133,
+          "end": 394,
+          "controller": "Roman Republic / Empire",
+          "status": "province",
+          "confidence": "high",
+          "note": "Pergamene inheritance became the Roman province of Asia."
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Eastern Roman Empire",
+          "status": "province",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "id": "anatolia_central",
+      "name": "Central and Eastern Anatolia",
+      "label": "アナトリア",
+      "polygons": [
+        [
+          [31.0, 41.3],
+          [37.0, 41.5],
+          [39.0, 38.0],
+          [36.0, 36.2],
+          [32.0, 37.2]
+        ]
+      ],
+      "control": [
+        {
+          "start": -25,
+          "end": 394,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Eastern Roman Empire",
+          "status": "province",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "id": "syria",
+      "name": "Syria",
+      "label": "シリア",
+      "polygons": [
+        [
+          [35.3, 37.2],
+          [38.8, 37.2],
+          [39.4, 34.0],
+          [36.8, 31.4],
+          [34.5, 32.5],
+          [35.2, 35.5]
+        ]
+      ],
+      "control": [
+        {
+          "start": -64,
+          "end": 394,
+          "controller": "Roman Republic / Empire",
+          "status": "province",
+          "confidence": "high"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Eastern Roman Empire",
+          "status": "province",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "id": "judea",
+      "name": "Judea and Palestine",
+      "label": "ユダヤ",
+      "polygons": [
+        [
+          [34.2, 32.8],
+          [36.6, 32.5],
+          [36.4, 30.9],
+          [34.8, 30.9],
+          [34.2, 31.8]
+        ]
+      ],
+      "control": [
+        {
+          "start": 6,
+          "end": 394,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Eastern Roman Empire",
+          "status": "province",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "id": "cyprus",
+      "name": "Cyprus",
+      "label": "キプロス",
+      "polygons": [
+        [
+          [32.4, 35.7],
+          [34.7, 35.5],
+          [34.4, 34.8],
+          [32.6, 34.9]
+        ]
+      ],
+      "control": [
+        {
+          "start": -58,
+          "end": 394,
+          "controller": "Roman Republic / Empire",
+          "status": "province",
+          "confidence": "high"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Eastern Roman Empire",
+          "status": "province",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "id": "gaul_narbonensis",
+      "name": "Gallia Narbonensis",
+      "label": "南ガリア",
+      "polygons": [
+        [
+          [2.0, 44.6],
+          [7.5, 44.8],
+          [7.8, 43.2],
+          [4.4, 42.5],
+          [2.0, 42.7]
+        ]
+      ],
+      "control": [
+        {
+          "start": -121,
+          "end": 406,
+          "controller": "Roman Republic / Empire",
+          "status": "province",
+          "confidence": "high"
+        },
+        {
+          "start": 407,
+          "end": 461,
+          "controller": "Western Roman Empire and foederati",
+          "status": "contested",
+          "confidence": "medium"
+        },
+        {
+          "start": 462,
+          "end": 476,
+          "controller": "Visigothic and Burgundian kingdoms",
+          "status": "lost",
+          "confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "gaul",
+      "name": "Gaul",
+      "label": "ガリア",
+      "polygons": [
+        [
+          [-4.8, 50.8],
+          [7.8, 50.8],
+          [7.8, 44.8],
+          [2.0, 42.7],
+          [-1.5, 43.2],
+          [-4.5, 46.0]
+        ]
+      ],
+      "control": [
+        {
+          "start": -50,
+          "end": 406,
+          "controller": "Roman Republic / Empire",
+          "status": "province",
+          "confidence": "medium",
+          "note": "Represents Caesar's conquest of Gaul in broad form."
+        },
+        {
+          "start": 407,
+          "end": 476,
+          "controller": "Roman remnants, Franks, Burgundians, and Visigoths",
+          "status": "contested",
+          "confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "egypt",
+      "name": "Egypt",
+      "label": "エジプト",
+      "polygons": [
+        [
+          [25.0, 31.8],
+          [35.0, 31.8],
+          [34.0, 29.0],
+          [31.5, 24.5],
+          [27.5, 24.8],
+          [26.0, 28.2]
+        ]
+      ],
+      "control": [
+        {
+          "start": -30,
+          "end": 394,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "high"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Eastern Roman Empire",
+          "status": "province",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "id": "alpine_danube",
+      "name": "Alpine and Danube Provinces",
+      "label": "アルプス・ドナウ",
+      "polygons": [
+        [
+          [7.5, 47.8],
+          [16.0, 48.6],
+          [23.0, 47.2],
+          [23.0, 44.5],
+          [17.5, 44.4],
+          [13.5, 46.2],
+          [7.5, 46.0]
+        ]
+      ],
+      "control": [
+        {
+          "start": -15,
+          "end": 394,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        },
+        {
+          "start": 395,
+          "end": 432,
+          "controller": "Western Roman Empire",
+          "status": "contested",
+          "confidence": "medium"
+        },
+        {
+          "start": 433,
+          "end": 476,
+          "controller": "Hunnic, Germanic, and Roman successor powers",
+          "status": "lost",
+          "confidence": "low"
+        }
+      ]
+    },
+    {
+      "id": "balkans_moesia",
+      "name": "Moesia and Lower Balkans",
+      "label": "下ドナウ",
+      "polygons": [
+        [
+          [19.0, 45.5],
+          [29.5, 45.8],
+          [29.5, 42.4],
+          [24.5, 41.2],
+          [22.0, 42.5],
+          [19.0, 42.0]
+        ]
+      ],
+      "control": [
+        {
+          "start": -29,
+          "end": 394,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Eastern Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "thrace",
+      "name": "Thrace",
+      "label": "トラキア",
+      "polygons": [
+        [
+          [23.8, 42.6],
+          [29.8, 42.7],
+          [29.2, 40.6],
+          [26.0, 40.2],
+          [24.0, 41.2]
+        ]
+      ],
+      "control": [
+        {
+          "start": 46,
+          "end": 394,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Eastern Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "britannia",
+      "name": "Britannia",
+      "label": "ブリタンニア",
+      "polygons": [
+        [
+          [-5.7, 55.6],
+          [1.5, 54.8],
+          [1.2, 50.4],
+          [-4.8, 50.0],
+          [-6.2, 52.0]
+        ]
+      ],
+      "control": [
+        {
+          "start": 43,
+          "end": 409,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        },
+        {
+          "start": 410,
+          "end": 476,
+          "controller": "Post-Roman Britain",
+          "status": "lost",
+          "confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "dacia",
+      "name": "Dacia",
+      "label": "ダキア",
+      "polygons": [
+        [
+          [21.5, 48.3],
+          [28.5, 48.0],
+          [29.5, 44.6],
+          [24.0, 43.5],
+          [21.3, 45.2]
+        ]
+      ],
+      "control": [
+        {
+          "start": 106,
+          "end": 270,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        },
+        {
+          "start": 271,
+          "end": 476,
+          "controller": "Abandoned north-Danube province",
+          "status": "lost",
+          "confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "arabia",
+      "name": "Arabia Petraea",
+      "label": "アラビア",
+      "polygons": [
+        [
+          [35.0, 31.5],
+          [40.8, 31.3],
+          [41.0, 28.5],
+          [38.3, 27.0],
+          [35.0, 29.0]
+        ]
+      ],
+      "control": [
+        {
+          "start": 106,
+          "end": 394,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        },
+        {
+          "start": 395,
+          "end": 476,
+          "controller": "Eastern Roman Empire",
+          "status": "province",
+          "confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "mesopotamia",
+      "name": "Mesopotamia",
+      "label": "メソポタミア",
+      "polygons": [
+        [
+          [39.0, 37.5],
+          [46.0, 37.2],
+          [46.5, 32.0],
+          [40.8, 31.0],
+          [39.2, 34.5]
+        ]
+      ],
+      "control": [
+        {
+          "start": 116,
+          "end": 117,
+          "controller": "Roman Empire",
+          "status": "occupied",
+          "confidence": "medium",
+          "note": "Trajan's short-lived eastern occupation."
+        },
+        {
+          "start": 198,
+          "end": 363,
+          "controller": "Roman Empire",
+          "status": "province",
+          "confidence": "low",
+          "note": "Coarse representation of later Roman holdings in northern Mesopotamia."
+        },
+        {
+          "start": 364,
+          "end": 476,
+          "controller": "Sasanian Persia and frontier zones",
+          "status": "lost",
+          "confidence": "low"
+        }
+      ]
+    },
+    {
+      "id": "armenia_client",
+      "name": "Armenia",
+      "label": "アルメニア",
+      "polygons": [
+        [
+          [39.0, 41.5],
+          [45.0, 41.6],
+          [45.5, 38.0],
+          [39.5, 38.0]
+        ]
+      ],
+      "control": [
+        {
+          "start": 114,
+          "end": 117,
+          "controller": "Roman Empire",
+          "status": "occupied",
+          "confidence": "low"
+        },
+        {
+          "start": 298,
+          "end": 387,
+          "controller": "Roman-aligned Armenia",
+          "status": "client_state",
+          "confidence": "low"
+        },
+        {
+          "start": 388,
+          "end": 476,
+          "controller": "Partitioned Armenian kingdoms",
+          "status": "contested",
+          "confidence": "low"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "year": -753,
+      "title": "ローマ建国伝承",
+      "body": "王政ローマの起点として扱う。初期領域は都市国家規模。"
+    },
+    {
+      "year": -509,
+      "title": "共和政の成立",
+      "body": "王政から共和政へ移行したとされる。"
+    },
+    {
+      "year": -338,
+      "title": "ラテン戦争後の拡大",
+      "body": "ローマはラティウム周辺への支配を強める。"
+    },
+    {
+      "year": -272,
+      "title": "南イタリアの掌握",
+      "body": "タレントゥム陥落後、イタリア半島南部への影響力が固まる。"
+    },
+    {
+      "year": -241,
+      "title": "シチリア属州",
+      "body": "第一次ポエニ戦争後、ローマ初の海外属州が生まれる。"
+    },
+    {
+      "year": -238,
+      "title": "サルデーニャ・コルシカ",
+      "body": "カルタゴ勢力の後退を受け、ローマが島嶼部を得る。"
+    },
+    {
+      "year": -197,
+      "title": "ヒスパニア属州",
+      "body": "第二次ポエニ戦争後、イベリア半島東部・南部が属州化される。"
+    },
+    {
+      "year": -191,
+      "title": "北イタリアの編入",
+      "body": "ポー川流域の支配が進み、イタリア北部がローマ圏に入る。"
+    },
+    {
+      "year": -146,
+      "title": "カルタゴとコリントス",
+      "body": "アフリカ属州とギリシア方面のローマ支配が確立する。"
+    },
+    {
+      "year": -133,
+      "title": "アジア属州",
+      "body": "ペルガモン王国の遺贈により小アジア西部がローマ領となる。"
+    },
+    {
+      "year": -121,
+      "title": "南ガリア属州",
+      "body": "地中海沿岸のガリアがローマ属州化される。"
+    },
+    {
+      "year": -64,
+      "title": "シリア属州",
+      "body": "ポンペイウスの東方再編によりシリアがローマの属州となる。"
+    },
+    {
+      "year": -58,
+      "title": "キプロス編入",
+      "body": "キプロスがローマ支配下に置かれる。"
+    },
+    {
+      "year": -50,
+      "title": "ガリア征服",
+      "body": "カエサルの遠征後、ガリア全域がローマ圏に入る。"
+    },
+    {
+      "year": -30,
+      "title": "エジプト併合",
+      "body": "プトレマイオス朝が終わり、エジプトは皇帝直轄に近い重要属州となる。"
+    },
+    {
+      "year": -27,
+      "title": "帝政の開始",
+      "body": "アウグストゥス体制が成立し、共和政から帝政へ移る。"
+    },
+    {
+      "year": -19,
+      "title": "ヒスパニアの平定",
+      "body": "カンタブリア戦争後、ヒスパニア内陸まで支配が広がる。"
+    },
+    {
+      "year": 43,
+      "title": "ブリタンニア侵攻",
+      "body": "クラウディウス帝期にブリテン島南部の属州化が始まる。"
+    },
+    {
+      "year": 44,
+      "title": "マウレタニア属州化",
+      "body": "北西アフリカが帝国の属州として組み込まれる。"
+    },
+    {
+      "year": 46,
+      "title": "トラキア属州",
+      "body": "トラキア王国がローマの属州となる。"
+    },
+    {
+      "year": 106,
+      "title": "トラヤヌスの拡大",
+      "body": "ダキアとアラビアが帝国に組み込まれる。"
+    },
+    {
+      "year": 117,
+      "title": "最大版図の時代",
+      "body": "トラヤヌス帝の末期、東方占領を含む最大級の版図に達する。"
+    },
+    {
+      "year": 212,
+      "title": "カラカラ勅令",
+      "body": "帝国内の自由民にローマ市民権が広く与えられる。"
+    },
+    {
+      "year": 271,
+      "title": "ダキア放棄",
+      "body": "アウレリアヌス帝がドナウ川北岸のダキア属州を放棄する。"
+    },
+    {
+      "year": 285,
+      "title": "帝国統治の分担",
+      "body": "ディオクレティアヌス期に東西分担統治が制度化されていく。"
+    },
+    {
+      "year": 330,
+      "title": "コンスタンティノープル",
+      "body": "新首都コンスタンティノープルが東地中海支配の中心となる。"
+    },
+    {
+      "year": 395,
+      "title": "東西分裂",
+      "body": "テオドシウス1世の死後、東西の宮廷が恒常的に分かれる。"
+    },
+    {
+      "year": 410,
+      "title": "ブリタンニア喪失とローマ劫掠",
+      "body": "ブリタンニアの実効支配が失われ、同年ローマ市も西ゴートに劫掠される。"
+    },
+    {
+      "year": 439,
+      "title": "カルタゴ喪失",
+      "body": "ヴァンダル王国がカルタゴを占領し、西ローマの財政基盤が大きく損なわれる。"
+    },
+    {
+      "year": 455,
+      "title": "ヴァンダルの海上勢力",
+      "body": "サルデーニャ・コルシカ方面も西ローマから離れていく。"
+    },
+    {
+      "year": 476,
+      "title": "西ローマ皇帝の廃位",
+      "body": "ロムルス・アウグストゥルスが廃位され、西ローマ帝国の終点として扱う。"
+    }
+  ]
+}
