@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakout</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main class="game-app">
+        <section class="game-panel" aria-label="Breakout game">
+            <header class="game-header">
+                <div>
+                    <h1>Breakout</h1>
+                    <p class="subtitle">Canvas + JavaScript</p>
+                </div>
+                <div class="hud" aria-live="polite">
+                    <div class="hud-item">
+                        <span>Score</span>
+                        <strong id="scoreValue">0</strong>
+                    </div>
+                    <div class="hud-item">
+                        <span>Lives</span>
+                        <strong id="livesValue">3</strong>
+                    </div>
+                    <div class="hud-item">
+                        <span>Balls</span>
+                        <strong id="ballsValue">1</strong>
+                    </div>
+                    <div class="hud-item hud-item-accent">
+                        <span>Combo</span>
+                        <strong id="comboValue">x1</strong>
+                    </div>
+                </div>
+            </header>
+
+            <div class="stage-wrap">
+                <canvas id="gameCanvas" width="720" height="520" tabindex="0" aria-label="Breakout play field"></canvas>
+                <button id="stageOverlay" class="stage-overlay" type="button">
+                    <span id="overlayTitle">START</span>
+                    <small id="overlayText">Click or press Space</small>
+                </button>
+            </div>
+
+            <div class="tuning-panel">
+                <label class="range-control" for="speedRange">
+                    <span>Speed <strong id="speedValue">0.5x</strong></span>
+                    <input id="speedRange" type="range" min="0.3" max="1.2" step="0.1" value="0.5">
+                </label>
+
+                <label class="range-control" for="paddleRange">
+                    <span>Paddle <strong id="paddleValue">120px</strong></span>
+                    <input id="paddleRange" type="range" min="80" max="220" step="10" value="120">
+                </label>
+
+                <div class="image-control">
+                    <label class="file-button" for="backgroundInput">Choose Image</label>
+                    <input id="backgroundInput" type="file" accept="image/*">
+                    <button id="clearBackgroundBtn" type="button">Clear Image</button>
+                    <span id="imageName">No image</span>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="startBtn" type="button">Start</button>
+                <button id="pauseBtn" type="button">Pause</button>
+                <button id="demoBtn" type="button">Demo</button>
+                <button id="restartBtn" type="button">Restart</button>
+            </div>
+
+            <div class="item-guide" aria-label="Item guide">
+                <span><b class="item-dot item-triple">x3</b> triple balls</span>
+                <span><b class="item-dot item-add">+3</b> add 3 balls</span>
+                <span><b class="item-dot item-wide">W</b> wider paddle</span>
+                <span><b class="item-dot item-pierce">P</b> pierce balls</span>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
