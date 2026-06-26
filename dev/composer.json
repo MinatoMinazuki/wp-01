@@ -1,0 +1,6 @@
+{
+    "license": "proprietary",
+    "require": {
+        "phpseclib/phpseclib": "^3.0"
+    }
+}
