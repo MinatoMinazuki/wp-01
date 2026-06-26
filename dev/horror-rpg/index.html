@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Night Echoes</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main class="game-shell">
+        <section class="screen-frame">
+            <header class="hud-row">
+                <div class="window-box compact">
+                    <p class="window-label">Location</p>
+                    <strong id="locationText">302号室</strong>
+                </div>
+                <div class="window-box compact">
+                    <p class="window-label">Chapter</p>
+                    <strong id="chapterText">Prologue</strong>
+                </div>
+                <div class="window-box compact">
+                    <p class="window-label">Fear</p>
+                    <strong id="fearText">Quiet</strong>
+                </div>
+                <div class="window-box compact">
+                    <p class="window-label">Items</p>
+                    <strong id="resourceText">マッチ 2 / 護符 0</strong>
+                </div>
+            </header>
+
+            <section class="stage-wrap">
+                <div class="canvas-frame">
+                    <canvas id="gameCanvas" width="720" height="576" aria-label="Night Echoes game screen" tabindex="0"></canvas>
+
+                    <div id="titleOverlay" class="full-overlay title-overlay">
+                        <div class="title-card">
+                            <p class="title-sub">JavaScript Horror RPG</p>
+                            <h1>Night Echoes</h1>
+                            <p class="title-copy">雨の夜に消えた姉を追って、町と学校と祠を巡る探索ホラー。</p>
+                            <div class="title-actions">
+                                <button id="startGameBtn" type="button">はじめる</button>
+                                <button id="loadGameBtn" type="button">つづきから</button>
+                                <button id="howToBtn" type="button">操作説明</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sceneOverlay" class="full-overlay scene-overlay is-hidden">
+                        <div class="scene-card">
+                            <p id="sceneChapter" class="scene-chapter"></p>
+                            <h2 id="sceneTitle"></h2>
+                            <p id="sceneBody"></p>
+                        </div>
+                    </div>
+
+                    <div id="endingOverlay" class="full-overlay ending-overlay is-hidden">
+                        <div class="ending-card">
+                            <p id="endingRoute" class="ending-route"></p>
+                            <h2 id="endingTitle"></h2>
+                            <p id="endingBody"></p>
+                            <div class="ending-actions">
+                                <button id="endingRestartBtn" type="button">タイトルへ戻る</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="objectiveWindow" class="window-box objective-window is-hidden">
+                        <p class="window-label">Objective</p>
+                        <p id="objectiveText" class="objective-text">部屋を調べ、姉の残した手掛かりを探す。</p>
+                    </div>
+
+                    <section id="dialogWindow" class="window-box dialog-window is-hidden" aria-live="polite">
+                        <div class="portrait-pane">
+                            <img id="portraitImage" alt="" class="portrait-image is-hidden">
+                        </div>
+                        <div class="dialog-pane">
+                            <div class="dialog-head">
+                                <p id="speakerText" class="speaker-text"></p>
+                                <p id="hintText" class="hint-text">Enter / E</p>
+                            </div>
+                            <div id="dialogText" class="dialog-text"></div>
+                            <div id="choiceList" class="choice-list"></div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <footer class="control-strip">
+                <div class="window-box compact small">
+                    <p class="window-label">Controls</p>
+                    <p class="control-text">Move: Arrow / WASD | 調べる: E / Enter | Menu: Tab / X | マッチ: Space</p>
+                </div>
+                <div class="button-row">
+                    <button id="menuBtn" type="button">Menu</button>
+                    <button id="interactBtn" type="button">調べる</button>
+                    <button id="matchBtn" type="button">マッチ</button>
+                </div>
+            </footer>
+        </section>
+    </main>
+
+    <section id="menuOverlay" class="menu-overlay is-hidden">
+        <div class="menu-panel">
+            <div class="menu-columns">
+                <section class="window-box menu-column">
+                    <p class="window-label">Inventory</p>
+                    <ul id="inventoryList" class="menu-list"></ul>
+                </section>
+                <section class="window-box menu-column">
+                    <p class="window-label">Notes</p>
+                    <ul id="notesList" class="menu-list"></ul>
+                </section>
+                <section class="window-box menu-column">
+                    <p class="window-label">Status</p>
+                    <ul id="statusList" class="menu-list"></ul>
+                </section>
+            </div>
+            <div class="menu-actions">
+                <button id="saveBtn" type="button">セーブ</button>
+                <button id="loadBtn" type="button">ロード</button>
+                <button id="closeMenuBtn" type="button">閉じる</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="mobile-pad" aria-label="Touch controls">
+        <button class="pad-btn" data-move="up" type="button">↑</button>
+        <button class="pad-btn" data-move="left" type="button">←</button>
+        <button class="pad-btn pad-main" data-action="interact" type="button">E</button>
+        <button class="pad-btn" data-move="right" type="button">→</button>
+        <button class="pad-btn" data-move="down" type="button">↓</button>
+        <button class="pad-btn pad-alt" data-action="match" type="button">火</button>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
