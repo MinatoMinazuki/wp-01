@@ -36,7 +36,7 @@ try {
     <form id="upload-form">
         <label for="receipt-image" class="upload-area">
             <p>📷 ここをタップしてレシートを撮影<br>（複数枚選択・撮影可能です）</p>
-            <input type="file" id="receipt-image" name="receipt_images[]" accept="image/*" capture="environment" multiple onchange="previewImages(this)">
+            <input type="file" id="receipt-image" name="receipt_images[]" accept="image/*" multiple onchange="previewImages(this)">
         </label>
 
         <div id="save-image-container" style="margin-top: 15px; text-align: center; display: none;">
@@ -47,6 +47,7 @@ try {
 
         <div id="preview-container" style="display: none; margin-top: 20px; text-align: left;">
             <p style="font-size: 14px; color: #666; margin-bottom: 5px;">プレビュー (クリックで拡大):</p>
+            <p id="preview-status" class="preview-status"></p>
             <div id="preview-grid" class="preview-grid"></div>
         </div>
 

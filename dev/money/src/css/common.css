@@ -184,6 +184,7 @@ h1 {
 .form-input,
 .form-select {
     width: 100%;
+    display: block;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -197,6 +198,13 @@ h1 {
 .form-select:focus {
     border-color: var(--primary-color);
     outline: none;
+}
+
+input[type="date"].form-input {
+    width: 100%;
+    min-width: 0;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 /* メッセージ */
@@ -294,6 +302,39 @@ input[type="file"] {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 10px;
     margin: 10px 0;
+}
+
+.preview-status {
+    margin: 0 0 10px;
+    color: #666;
+    font-size: 13px;
+}
+
+.preview-card {
+    position: relative;
+}
+
+.preview-card.is-active .preview-item {
+    border: 2px solid var(--success-color);
+    box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.15);
+}
+
+.preview-card.is-done .preview-item {
+    opacity: 0.55;
+}
+
+.preview-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 1;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(44, 62, 80, 0.85);
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    pointer-events: none;
 }
 
 .gallery-item,
@@ -395,6 +436,11 @@ input[type="file"] {
     font-family: inherit;
 }
 
+.month-apply-mobile {
+    display: none;
+    white-space: nowrap;
+}
+
 /* 認証カード */
 .auth-card {
     background: white;
@@ -416,6 +462,27 @@ input[type="file"] {
     }
 
     /* テーブルをカード形式に変換 */
+    .month-selector {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .month-selector .month-input {
+        order: 1;
+        flex: 1 1 100%;
+        width: 100%;
+    }
+
+    .month-selector .month-apply-mobile {
+        display: inline-block;
+        order: 2;
+        margin-left: auto;
+    }
+
+    .month-selector .btn:not(.month-apply-mobile) {
+        order: 3;
+    }
+
     .table-responsive,
     .table-responsive thead,
     .table-responsive tbody,
@@ -435,7 +502,7 @@ input[type="file"] {
         border-radius: var(--radius);
         margin-bottom: 15px;
         background-color: #fff;
-        padding: 10px;
+        padding: 18px 10px 10px;
         position: relative;
         box-sizing: border-box;
     }
@@ -461,6 +528,14 @@ input[type="file"] {
         display: none;
     }
 
+    .table-responsive td:last-child {
+        position: static;
+        padding: 0;
+        min-height: 0;
+        display: block;
+        text-align: right;
+    }
+
     .btn-responsive-full {
         width: 100%;
         margin-top: 5px;
@@ -469,8 +544,8 @@ input[type="file"] {
 
     .btn-remove-responsive {
         position: absolute;
-        top: -10px;
-        right: -10px;
+        top: 8px;
+        right: 8px;
         width: 25px;
         height: 25px;
         font-size: 12px;

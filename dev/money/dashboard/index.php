@@ -59,6 +59,7 @@ unset($cat);
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="../src/js/dashboard.js"></script>
+    <script src="../src/js/month_selector.js"></script>
 </head>
 <body>
 
@@ -76,7 +77,8 @@ unset($cat);
 
     <div class="month-selector">
         <a href="?ym=<?= $prevMonth ?>" class="btn btn-info btn-rounded font-14 py-1 px-3">◀︎ 前月</a>
-        <input type="month" value="<?= $ym ?>" class="month-input" onchange="location.href='?ym=' + this.value">
+        <input type="month" value="<?= $ym ?>" class="month-input js-month-input">
+        <button type="button" class="btn btn-primary month-apply-mobile js-month-apply">Go</button>
         <a href="?ym=<?= $nextMonth ?>" class="btn btn-info btn-rounded font-14 py-1 px-3">次月 ▶︎</a>
     </div>
 

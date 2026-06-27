@@ -74,7 +74,8 @@ $nextMonth = date('Y-m', strtotime($ym . '-01 +1 month'));
 
     <div class="month-selector">
         <a href="?ym=<?= $prevMonth ?>" class="btn btn-info" style="border-radius: 20px; font-size: 14px; padding: 6px 15px;">◀︎ 前月</a>
-        <input type="month" value="<?= $ym ?>" class="month-input" onchange="location.href='?ym=' + this.value">
+        <input type="month" value="<?= $ym ?>" class="month-input js-month-input">
+        <button type="button" class="btn btn-primary month-apply-mobile js-month-apply">Go</button>
         <a href="?ym=<?= $nextMonth ?>" class="btn btn-info" style="border-radius: 20px; font-size: 14px; padding: 6px 15px;">次月 ▶︎</a>
     </div>
 
@@ -118,5 +119,6 @@ $nextMonth = date('Y-m', strtotime($ym . '-01 +1 month'));
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="../src/js/month_selector.js"></script>
 </body>
 </html>

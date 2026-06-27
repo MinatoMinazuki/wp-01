@@ -1,37 +1,128 @@
-/* index.js - トップ画面用スクリプト (jQuery版) */
+let selectedFiles = [];
+let currentFileIndex = 0;
+let isAnalyzing = false;
 
-// 画像プレビュー機能
-function previewImages(input) {
+function getCurrentFile() {
+    return selectedFiles[currentFileIndex] || null;
+}
+
+function clearResultForm() {
+    const editForm = $('#edit-form')[0];
+    if (editForm) {
+        editForm.reset();
+    }
+
+    $('#edit-saved-images').val('');
+    $('#items-tbody').empty();
+    $('#result-container').hide();
+}
+
+function resetSelection() {
+    selectedFiles = [];
+    currentFileIndex = 0;
+    $('#receipt-image').val('');
+    $('#preview-grid').empty();
+    $('#preview-status').text('');
+    $('#preview-container').hide();
+    $('#save-image-container').hide();
+    clearResultForm();
+}
+
+function updateAnalyzeButton() {
+    const $submitBtn = $('#submit-btn');
+    const defaultText = $submitBtn.data('default-text') || $submitBtn.text().trim();
+    const currentFile = getCurrentFile();
+
+    if (!$submitBtn.data('default-text')) {
+        $submitBtn.data('default-text', defaultText);
+    }
+
+    if (!currentFile) {
+        $submitBtn.prop('disabled', true).text(defaultText);
+        return;
+    }
+
+    const suffix = selectedFiles.length > 1 ? ` (${currentFileIndex + 1}/${selectedFiles.length})` : '';
+    const buttonText = isAnalyzing ? `Analyzing...${suffix}` : `${defaultText}${suffix}`;
+
+    $submitBtn.prop('disabled', isAnalyzing).text(buttonText);
+}
+
+function updatePreviewStatus() {
+    const total = selectedFiles.length;
+
+    if (!total) {
+        $('#preview-status').text('');
+        return;
+    }
+
+    const statusText = total > 1
+        ? `Processing ${currentFileIndex + 1} / ${total}`
+        : 'Processing 1 / 1';
+
+    $('#preview-status').text(statusText);
+}
+
+function renderPreviewImages() {
     const $previewContainer = $('#preview-container');
     const $previewGrid = $('#preview-grid');
     const $saveImageContainer = $('#save-image-container');
-    const $submitBtn = $('#submit-btn');
 
     $previewGrid.empty();
 
-    if (input.files && input.files.length > 0) {
-        Array.from(input.files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                $('<img>', {
-                    src: e.target.result,
-                    class: 'preview-item',
-                    click: function () { openModal(e.target.result); }
-                }).appendTo($previewGrid);
-            }
-            reader.readAsDataURL(file);
-        });
-        $previewContainer.show();
-        $saveImageContainer.show();
-        $submitBtn.prop('disabled', false);
-    } else {
+    if (!selectedFiles.length) {
         $previewContainer.hide();
         $saveImageContainer.hide();
-        $submitBtn.prop('disabled', true);
+        updatePreviewStatus();
+        updateAnalyzeButton();
+        return;
     }
+
+    selectedFiles.forEach(function (file, index) {
+        const reader = new FileReader();
+        const stateClass = index === currentFileIndex
+            ? ' is-active'
+            : index < currentFileIndex
+                ? ' is-done'
+                : '';
+        const badgeText = index === currentFileIndex ? 'Now' : index < currentFileIndex ? 'Done' : `${index + 1}`;
+        const $card = $('<div>', { class: `preview-card${stateClass}` });
+        const $image = $('<img>', {
+            class: 'preview-item',
+            alt: file.name || `receipt-${index + 1}`
+        });
+
+        $('<span>', {
+            class: 'preview-badge',
+            text: badgeText
+        }).appendTo($card);
+
+        reader.onload = function (e) {
+            const imageSrc = e.target.result;
+            $image.attr('src', imageSrc);
+            $image.on('click', function () {
+                openModal(imageSrc);
+            });
+        };
+
+        reader.readAsDataURL(file);
+        $image.appendTo($card);
+        $previewGrid.append($card);
+    });
+
+    $previewContainer.show();
+    $saveImageContainer.show();
+    updatePreviewStatus();
+    updateAnalyzeButton();
 }
 
-// モーダル操作
+function previewImages(input) {
+    selectedFiles = Array.from(input.files || []);
+    currentFileIndex = 0;
+    clearResultForm();
+    renderPreviewImages();
+}
+
 function openModal(src) {
     $('#modal-img').attr('src', src);
     $('#image-modal').css('display', 'flex');
@@ -41,101 +132,109 @@ function closeModal() {
     $('#image-modal').hide();
 }
 
-// 商品行追加
-function addItemRow(name = '', price = '') {
+function addItemRow(name, price) {
+    const itemName = name || '';
+    const itemPrice = price || '';
     const $tbody = $('#items-tbody');
     const $tr = $('<tr>').append(`
-        <td><input type="text" name="item_name[]" value="${name}" placeholder="商品名" class="form-input" required></td>
-        <td><input type="number" name="item_price[]" value="${price}" placeholder="金額" class="form-input" required></td>
+        <td><input type="text" name="item_name[]" value="${itemName}" class="form-input" required></td>
+        <td><input type="number" name="item_price[]" value="${itemPrice}" class="form-input" required></td>
         <td style="text-align: center;">
-            <button type="button" class="btn btn-danger btn-remove btn-remove-responsive" title="削除">×</button>
+            <button type="button" class="btn btn-danger btn-remove btn-remove-responsive" title="Remove">x</button>
         </td>
     `);
+
     $tbody.append($tr);
 }
 
+function fillResultForm(data) {
+    $('#edit-store-name').val(data.store_name || '');
+    $('#edit-date').val(data.date || '');
+    $('#edit-category').val(data.category || '');
+    $('#edit-total-amount').val(data.total_amount || '');
+    $('#edit-tax-amount').val(data.tax_amount || 0);
+    $('#edit-saved-images').val(data.saved_images ? JSON.stringify(data.saved_images) : '');
+
+    $('#items-tbody').empty();
+
+    if (Array.isArray(data.items) && data.items.length > 0) {
+        $.each(data.items, function (_, item) {
+            addItemRow(item.name || '', item.price || '');
+        });
+    } else {
+        addItemRow('', '');
+    }
+
+    $('#result-container').show();
+}
+
+function analyzeCurrentFile() {
+    const currentFile = getCurrentFile();
+
+    if (!currentFile || isAnalyzing) {
+        return;
+    }
+
+    const formData = new FormData();
+    const $loading = $('#loading');
+
+    formData.append('receipt_images[]', currentFile);
+    formData.append('save_image', $('#save-image').is(':checked') ? '1' : '0');
+
+    isAnalyzing = true;
+    updateAnalyzeButton();
+    $('#result-container').hide();
+    $loading.show();
+
+    $.ajax({
+        url: 'analyze_receipt.php',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            fillResultForm(data);
+        },
+        error: function (xhr) {
+            console.error('Raw response:', xhr.responseText);
+            const errorData = xhr.responseJSON || {};
+            const msg = errorData.error || `Unknown error (${xhr.status} ${xhr.statusText})`;
+            alert(`Analysis failed.\n${msg}`);
+        },
+        complete: function () {
+            isAnalyzing = false;
+            updateAnalyzeButton();
+            $loading.hide();
+        }
+    });
+}
+
 $(function () {
-    // 削除ボタンの委譲
+    const $registerButton = $('#btn-register');
+    const defaultRegisterText = $registerButton.text().trim();
+
     $('#items-tbody').on('click', '.btn-remove', function () {
         $(this).closest('tr').remove();
     });
 
-    // 解析フォーム送信
     $('#upload-form').on('submit', function (e) {
         e.preventDefault();
-
-        const fileInput = $('#receipt-image')[0];
-        if (!fileInput.files.length) return;
-
-        const formData = new FormData();
-        Array.from(fileInput.files).forEach(file => {
-            formData.append('receipt_images[]', file);
-        });
-
-        const saveImage = $('#save-image').is(':checked') ? '1' : '0';
-        formData.append('save_image', saveImage);
-
-        const $submitBtn = $('#submit-btn');
-        const $loading = $('#loading');
-        const $resultContainer = $('#result-container');
-
-        $submitBtn.prop('disabled', true).text("分析中...");
-        $loading.show();
-        $resultContainer.hide();
-
-        $.ajax({
-            url: 'analyze_receipt.php',
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (data) {
-                $('#edit-store-name').val(data.store_name || '');
-                $('#edit-date').val(data.date || '');
-                $('#edit-category').val(data.category || '');
-                $('#edit-total-amount').val(data.total_amount || '');
-                $('#edit-tax-amount').val(data.tax_amount || 0);
-                $('#edit-saved-images').val(data.saved_images ? JSON.stringify(data.saved_images) : '');
-
-                const $tbody = $('#items-tbody').empty();
-                if (data.items && Array.isArray(data.items)) {
-                    $.each(data.items, (i, item) => {
-                        addItemRow(item.name || '', item.price || '');
-                    });
-                } else {
-                    addItemRow();
-                }
-
-                $resultContainer.show();
-            },
-            error: function (xhr) {
-                console.error('Raw response:', xhr.responseText);
-                const errorData = xhr.responseJSON || {};
-                const msg = errorData.error || '不明なエラー (' + xhr.status + ' ' + xhr.statusText + ')';
-                alert("エラーが発生しました。\n" + msg + "\n詳細はブラウザのコンソールを確認してください。");
-            },
-            complete: function () {
-                $submitBtn.prop('disabled', false).text("AIで分析して登録");
-                $loading.hide();
-            }
-        });
+        analyzeCurrentFile();
     });
 
-    // 行追加
     $('#btn-add-item').on('click', function () {
-        addItemRow();
+        addItemRow('', '');
     });
 
-    // 編集フォーム送信
     $('#edit-form').on('submit', function (e) {
         e.preventDefault();
 
         const formData = new FormData(this);
         const submitData = Object.fromEntries(formData.entries());
-
-        submitData.items = [];
         const itemNames = formData.getAll('item_name[]');
         const itemPrices = formData.getAll('item_price[]');
+
+        submitData.items = [];
 
         for (let i = 0; i < itemNames.length; i++) {
             submitData.items.push({
@@ -153,8 +252,7 @@ $(function () {
             }
         }
 
-        const $submitBtn = $('#btn-register');
-        $submitBtn.prop('disabled', true).text('登録中...');
+        $registerButton.prop('disabled', true).text('Saving...');
 
         $.ajax({
             url: 'save_receipt.php',
@@ -162,23 +260,32 @@ $(function () {
             contentType: 'application/json',
             data: JSON.stringify(submitData),
             success: function (data) {
-                alert("✅ " + data.message + "\n\nレシートID: " + data.receipt_id + "\n登録された商品数: " + data.inserted_items);
-                $('#edit-form')[0].reset();
-                $('#result-container').hide();
-                $('#preview-grid').empty();
-                $('#preview-container').hide();
-                $('#save-image-container').hide();
-                $('#receipt-image').val("");
-                $('#submit-btn').prop('disabled', true);
+                const hasNextFile = currentFileIndex < selectedFiles.length - 1;
+                const message = `Saved.\n\nReceipt ID: ${data.receipt_id}\nItems: ${data.inserted_items}`;
+
+                alert(message);
+                clearResultForm();
+
+                if (hasNextFile) {
+                    currentFileIndex += 1;
+                    renderPreviewImages();
+                    analyzeCurrentFile();
+                    return;
+                }
+
+                resetSelection();
+                updateAnalyzeButton();
             },
             error: function (xhr) {
                 const errorData = xhr.responseJSON || {};
-                const msg = errorData.error || 'データベースの登録に失敗しました (' + xhr.status + ' ' + xhr.statusText + ')';
-                alert("エラーが発生しました。\n" + msg);
+                const msg = errorData.error || `Save failed (${xhr.status} ${xhr.statusText})`;
+                alert(`Save failed.\n${msg}`);
             },
             complete: function () {
-                $submitBtn.prop('disabled', false).text('この内容で家計簿に登録する');
+                $registerButton.prop('disabled', false).text(defaultRegisterText);
             }
         });
     });
+
+    updateAnalyzeButton();
 });
