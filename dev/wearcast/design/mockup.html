@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wearcast Rough Mockup</title>
+  <style>
+    :root {
+      --ink: #142126;
+      --sand: #f6f1e8;
+      --clay: #e9dcc6;
+      --pine: #25433b;
+      --ember: #c46a3c;
+      --fog: #dbe5e1;
+      --card: rgba(255,255,255,0.78);
+      --line: rgba(20,33,38,0.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(196,106,60,0.14), transparent 28%),
+        linear-gradient(180deg, var(--sand), var(--fog));
+    }
+    .page {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 48px 28px 80px;
+    }
+    .intro {
+      margin-bottom: 28px;
+    }
+    .intro p {
+      margin: 0 0 10px;
+      letter-spacing: .12em;
+      color: #64716c;
+      font-size: 12px;
+    }
+    .intro h1 {
+      margin: 0;
+      font-size: 48px;
+      line-height: 1.05;
+    }
+    .intro .sub {
+      margin-top: 12px;
+      font-size: 18px;
+      color: #4b5a55;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .phone {
+      border-radius: 36px;
+      padding: 22px;
+      background: rgba(255,255,255,0.42);
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: 0 28px 60px rgba(31,43,39,0.09);
+      backdrop-filter: blur(14px);
+    }
+    .phone h2 {
+      margin: 0 0 18px;
+      font-size: 24px;
+    }
+    .hero, .card, .chip, .btn {
+      border-radius: 24px;
+    }
+    .hero {
+      padding: 24px;
+      background: linear-gradient(160deg, var(--pine), #10191d);
+      color: #fff;
+      margin-bottom: 18px;
+    }
+    .eyebrow {
+      margin: 0 0 10px;
+      font-size: 11px;
+      letter-spacing: .14em;
+      opacity: .78;
+    }
+    .hero h3 {
+      margin: 0;
+      font-size: 36px;
+    }
+    .hero .meta {
+      margin-top: 38px;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+    }
+    .hero .temp {
+      font-size: 40px;
+      font-weight: 700;
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .card {
+      padding: 18px;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+    .card h4, .card p {
+      margin: 0;
+    }
+    .card p {
+      margin-top: 10px;
+      color: #4b5a55;
+    }
+    .section {
+      margin-top: 18px;
+    }
+    .section .label {
+      margin: 0 0 12px;
+      font-size: 11px;
+      letter-spacing: .14em;
+      color: #65736d;
+    }
+    .chips {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .chip {
+      min-height: 76px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: rgba(255,255,255,0.75);
+      border: 1px solid var(--line);
+    }
+    .chip.active {
+      background: var(--pine);
+      color: #fff;
+      border-color: transparent;
+    }
+    .btn {
+      margin-top: 18px;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      background: var(--ember);
+      color: #fff;
+    }
+    .btn.alt {
+      background: var(--pine);
+    }
+    @media (max-width: 1080px) {
+      .board { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="intro">
+      <p>DESIGN RESET</p>
+      <h1>Wearcast should feel like a daily style decision, not a weather form.</h1>
+      <div class="sub">One strong recommendation. Warm editorial tone. Fast morning scan.</div>
+    </div>
+
+    <div class="board">
+      <section class="phone">
+        <h2>Today</h2>
+        <div class="hero">
+          <p class="eyebrow">TODAY'S PICK</p>
+          <h3>長袖 + 羽織</h3>
+          <p>朝晩を外さず、昼も重く見えない。</p>
+          <div class="meta">
+            <div class="temp">27° / 19°</div>
+            <div>晴れ / 降水20%</div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <h4>東京地方</h4>
+            <p>予報の根拠を短く置く</p>
+          </div>
+          <div class="card">
+            <h4>傘を持つ</h4>
+            <p>服装以外の補足は小さく</p>
+          </div>
+        </div>
+        <div class="card">
+          <h4>似た日の記録</h4>
+          <div style="display:grid;grid-template-columns:86px 1fr;gap:14px;align-items:start;margin-top:12px;">
+            <div style="height:116px;border-radius:18px;background:linear-gradient(180deg,#d7c2ab,#b88e72);"></div>
+            <div>
+              <p style="margin-top:0;">2026/06/12 26° / 18° 晴れ</p>
+              <p>長袖 + 羽織 / ちょうどよかった</p>
+              <p style="font-size:13px;color:#6b7772;">写真がない場合はサムネ枠を消して、テキストカードだけに戻す</p>
+            </div>
+          </div>
+        </div>
+        <div class="btn">今日の服装を記録</div>
+      </section>
+
+      <section class="phone">
+        <h2>Record</h2>
+        <div class="card">
+          <h4>晴れ 27° / 19°</h4>
+          <p>上部は当日の要約だけ</p>
+        </div>
+        <div class="section">
+          <p class="label">OUTFIT CATEGORY</p>
+          <div class="chips">
+            <div class="chip">半袖</div>
+            <div class="chip">薄手長袖</div>
+            <div class="chip">長袖</div>
+            <div class="chip">羽織</div>
+            <div class="chip active">長袖 + 羽織</div>
+            <div class="chip">コート</div>
+          </div>
+        </div>
+        <div class="section">
+          <p class="label">FEELING</p>
+          <div class="grid2">
+            <div class="card">暑い</div>
+            <div class="card">ちょうど</div>
+          </div>
+        </div>
+        <div class="card">
+          <h4>写真とコメント</h4>
+          <p>アップロード領域をもっと視覚的に扱う</p>
+        </div>
+        <div class="btn">保存する</div>
+      </section>
+
+      <section class="phone">
+        <h2>Settings</h2>
+        <div class="section">
+          <p class="label">MAIN LOCATION</p>
+          <div class="card">
+            <h4>東京都 / 東京地方</h4>
+            <p>操作は段階的に見せる</p>
+          </div>
+        </div>
+        <div class="section">
+          <p class="label">SUB LOCATION</p>
+          <div class="card">
+            <h4>神奈川県 / 東部</h4>
+            <p>サブは任意で軽く見せる</p>
+          </div>
+        </div>
+        <div class="section">
+          <p class="label">CURRENT LOCATION</p>
+          <div class="card">
+            <h4>東京駅周辺を検出</h4>
+            <p>補助機能として扱い、主役にしない</p>
+          </div>
+        </div>
+        <div class="btn alt">設定を保存</div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

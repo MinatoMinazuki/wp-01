@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f7fbff"/>
+      <stop offset="100%" stop-color="#d7e5f1"/>
+    </linearGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4d8fcb"/>
+      <stop offset="100%" stop-color="#1e5d96"/>
+    </linearGradient>
+    <style>
+      .title { font: 700 44px 'Arial', sans-serif; fill: #11243a; }
+      .label { font: 700 18px 'Arial', sans-serif; fill: #6b8195; letter-spacing: 2px; }
+      .h2 { font: 700 28px 'Arial', sans-serif; fill: #11243a; }
+      .body { font: 400 18px 'Arial', sans-serif; fill: #496176; }
+      .temp { font: 700 42px 'Arial', sans-serif; fill: #ffffff; }
+      .heroText { font: 700 34px 'Arial', sans-serif; fill: #ffffff; }
+      .small { font: 400 15px 'Arial', sans-serif; fill: #70869a; }
+      .screenTitle { font: 700 24px 'Arial', sans-serif; fill: #11243a; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1200" fill="url(#bg)"/>
+  <circle cx="1450" cy="130" r="220" fill="#7bb4e5" opacity="0.14"/>
+  <circle cx="140" cy="1060" r="260" fill="#4d8fcb" opacity="0.08"/>
+
+  <text x="90" y="95" class="title">Wearcast Redesign Direction</text>
+  <text x="92" y="128" class="body">mobile-first / editorial practical / one-answer recommendation</text>
+
+  <g transform="translate(90 190)">
+    <rect width="410" height="870" rx="38" fill="#fbfdff" stroke="#d9e6f0"/>
+    <text x="34" y="54" class="screenTitle">01 Today</text>
+
+    <rect x="28" y="88" width="354" height="250" rx="28" fill="url(#hero)"/>
+    <text x="54" y="126" class="label" fill="#d7e3df">TODAY'S PICK</text>
+    <text x="54" y="175" class="heroText">長袖 + 羽織</text>
+    <text x="54" y="215" class="body" fill="#d7e3df">朝晩を外さず、昼も重く見えない</text>
+    <text x="54" y="285" class="temp">27° / 19°</text>
+    <text x="54" y="316" class="body" fill="#d7e3df">晴れ / 降水 20%</text>
+
+    <rect x="28" y="364" width="170" height="116" rx="22" fill="#eef6fd"/>
+    <text x="50" y="402" class="small">Weather</text>
+    <text x="50" y="447" class="h2">東京地方</text>
+
+    <rect x="212" y="364" width="170" height="116" rx="22" fill="#e6f0f8"/>
+    <text x="234" y="402" class="small">Rain</text>
+    <text x="234" y="447" class="h2">傘を持つ</text>
+
+    <text x="34" y="538" class="label">SIMILAR DAY</text>
+    <rect x="28" y="560" width="354" height="168" rx="24" fill="#ffffff" stroke="#dde8f1"/>
+    <rect x="48" y="580" width="96" height="128" rx="18" fill="#bfd7ec"/>
+    <rect x="156" y="580" width="206" height="128" rx="18" fill="#f3f9fe"/>
+    <text x="176" y="614" class="h2">2026/06/12</text>
+    <text x="176" y="644" class="body">26° / 18° 晴れ</text>
+    <text x="176" y="676" class="body">記録: 長袖 + 羽織</text>
+    <text x="176" y="704" class="small">写真がなければこの面を全面表示</text>
+
+    <rect x="28" y="774" width="354" height="76" rx="20" fill="#4d8fcb"/>
+    <text x="205" y="822" text-anchor="middle" class="h2" fill="#ffffff">今日の服装を記録</text>
+  </g>
+
+  <g transform="translate(595 190)">
+    <rect width="410" height="870" rx="38" fill="#fbfdff" stroke="#d9e6f0"/>
+    <text x="34" y="54" class="screenTitle">02 Record</text>
+
+    <rect x="28" y="88" width="354" height="104" rx="24" fill="#eef6fd"/>
+    <text x="50" y="128" class="small">TODAY</text>
+    <text x="50" y="167" class="h2">晴れ 27° / 19°</text>
+
+    <text x="34" y="246" class="label">OUTFIT CATEGORY</text>
+    <g transform="translate(28 272)">
+      <rect width="112" height="86" rx="20" fill="#ffffff" stroke="#dbe7f0"/>
+      <rect x="121" width="112" height="86" rx="20" fill="#ffffff" stroke="#dbe7f0"/>
+      <rect x="242" width="112" height="86" rx="20" fill="#ffffff" stroke="#dbe7f0"/>
+      <rect y="98" width="112" height="86" rx="20" fill="#ffffff" stroke="#dbe7f0"/>
+      <rect x="121" y="98" width="112" height="86" rx="20" fill="#1e5d96"/>
+      <rect x="242" y="98" width="112" height="86" rx="20" fill="#ffffff" stroke="#dbe7f0"/>
+      <text x="56" y="50" text-anchor="middle" class="body">半袖</text>
+      <text x="177" y="50" text-anchor="middle" class="body">薄手長袖</text>
+      <text x="298" y="50" text-anchor="middle" class="body">長袖</text>
+      <text x="56" y="148" text-anchor="middle" class="body">羽織</text>
+      <text x="177" y="148" text-anchor="middle" class="body" fill="#ffffff">長袖 + 羽織</text>
+      <text x="298" y="148" text-anchor="middle" class="body">コート</text>
+    </g>
+
+    <text x="34" y="504" class="label">FEELING</text>
+    <g transform="translate(28 526)">
+      <rect width="104" height="58" rx="16" fill="#ffffff" stroke="#dbe7f0"/>
+      <rect x="124" width="104" height="58" rx="16" fill="#e6f0f8"/>
+      <rect x="248" width="104" height="58" rx="16" fill="#ffffff" stroke="#dbe7f0"/>
+      <text x="52" y="36" text-anchor="middle" class="body">暑い</text>
+      <text x="176" y="36" text-anchor="middle" class="body">ちょうど</text>
+      <text x="300" y="36" text-anchor="middle" class="body">寒い</text>
+    </g>
+
+    <text x="34" y="640" class="label">PHOTO + NOTE</text>
+    <rect x="28" y="664" width="354" height="138" rx="24" fill="#ffffff" stroke="#dbe7f0" stroke-dasharray="8 8"/>
+    <text x="205" y="735" text-anchor="middle" class="body">写真を追加 / コメントを書く</text>
+
+    <rect x="28" y="816" width="354" height="76" rx="20" fill="#4d8fcb"/>
+    <text x="205" y="864" text-anchor="middle" class="h2" fill="#ffffff">保存する</text>
+  </g>
+
+  <g transform="translate(1100 190)">
+    <rect width="410" height="870" rx="38" fill="#fbfdff" stroke="#d9e6f0"/>
+    <text x="34" y="54" class="screenTitle">03 Settings</text>
+
+    <text x="34" y="118" class="label">MAIN LOCATION</text>
+    <rect x="28" y="140" width="354" height="116" rx="24" fill="#ffffff" stroke="#dbe7f0"/>
+    <text x="50" y="184" class="body">東京都</text>
+    <text x="50" y="222" class="h2">東京地方</text>
+
+    <text x="34" y="322" class="label">SUB LOCATION</text>
+    <rect x="28" y="344" width="354" height="116" rx="24" fill="#ffffff" stroke="#dbe7f0"/>
+    <text x="50" y="388" class="body">神奈川県</text>
+    <text x="50" y="426" class="h2">東部</text>
+
+    <text x="34" y="526" class="label">CURRENT LOCATION</text>
+    <rect x="28" y="548" width="354" height="170" rx="24" fill="#e6f0f8"/>
+    <text x="50" y="592" class="body">現在地を使う</text>
+    <text x="50" y="632" class="h2">東京駅周辺を検出</text>
+    <rect x="50" y="658" width="180" height="42" rx="12" fill="#1e5d96"/>
+    <text x="140" y="685" text-anchor="middle" class="body" fill="#ffffff">現在地から候補を取得</text>
+
+    <rect x="28" y="816" width="354" height="76" rx="20" fill="#1e5d96"/>
+    <text x="205" y="864" text-anchor="middle" class="h2" fill="#ffffff">設定を保存</text>
+  </g>
+</svg>

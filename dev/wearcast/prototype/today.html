@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wearcast Today Prototype</title>
+  <link rel="stylesheet" href="./today.css">
+</head>
+<body>
+  <main class="page-skin is-sunny is-day" id="page-skin">
+  <div class="prototype-page">
+    <header class="prototype-header">
+      <p class="prototype-header__eyebrow">TODAY SCREEN PROTOTYPE</p>
+      <h1>朝いちで迷わせない。今日の服装だけを強く見せる。</h1>
+      <p>Weather 情報は証拠として置き、主役は一つの服装提案に固定。色は空と雲の方向へ寄せ、茶色っぽさを消しています。similar day は写真がある場合だけ写真を前に出し、ない場合はテキストの信頼カードに戻します。</p>
+    </header>
+
+    <section class="prototype-grid">
+      <div class="phone">
+        <div class="phone__frame">
+          <div class="appbar">
+            <div>
+              <p class="appbar__eyebrow">WEARCAST</p>
+              <h2 class="appbar__title">今日の服装</h2>
+            </div>
+            <div class="appbar__action">地点</div>
+          </div>
+
+          <div class="screen">
+            <section class="hero is-sunny is-day" id="today-hero">
+              <p class="hero__eyebrow">TODAY'S PICK</p>
+              <h3 class="hero__title">長袖 + 羽織</h3>
+              <p class="hero__summary">朝晩を外さず、昼も重く見えない。暑すぎず冷えすぎない中間の正解。</p>
+              <div class="hero__meta">
+                <div>
+                  <p class="hero__temp">27° / 19°</p>
+                  <p class="hero__weather">晴れ / 降水 20%</p>
+                </div>
+                <div class="hero__location">
+                  <strong>東京地方</strong>
+                  <span>6/27 Sat</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="weather-strip">
+              <article class="mini-card">
+                <p class="mini-card__label">WEATHER</p>
+                <p class="mini-card__value">晴れ</p>
+                <p class="mini-card__sub">風は弱め。日中は軽く動ける。</p>
+              </article>
+              <article class="mini-card">
+                <p class="mini-card__label">RAIN NOTE</p>
+                <p class="mini-card__value">傘を持つ</p>
+                <p class="mini-card__sub">急なにわか雨だけ拾う。</p>
+              </article>
+            </section>
+
+            <section class="section">
+              <p class="section__eyebrow">SIMILAR DAY</p>
+              <h3 class="section__title">写真がある日は、記録を目で信じられる。</h3>
+              <div class="similar">
+                <div class="similar__photo"></div>
+                <div class="similar__info">
+                  <div>
+                    <p class="similar__date">2026 / 06 / 12</p>
+                    <h4 class="similar__headline">26° / 18° 晴れ</h4>
+                    <p class="similar__detail">記録: 長袖 + 羽織<br>感想: ちょうどよかった</p>
+                  </div>
+                </div>
+              </div>
+              <div class="cta">今日の服装を記録する</div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <div class="notes">
+        <article class="note-card">
+          <h2>今回の方針</h2>
+          <p>今まで弱かったのは、服装提案と天気情報が同じ強さで並んでいたことです。この案では、最初に見るのは服装、そのあとに気温と降水、最後に similar day の証拠、という順番に固定しています。</p>
+          <ul>
+            <li>大きな推奨カテゴリをヒーローに固定</li>
+            <li>天気は小さめの補助カードへ圧縮</li>
+            <li>CTA はスクロール終端でなく、similar day の直後に配置</li>
+          </ul>
+        </article>
+
+        <article class="note-card">
+          <h2>背景色ルール</h2>
+          <p>`今日の服装` ヒーローは、天気と時間帯で背景トーンを変えます。朝はやや白み、昼は明るく、夜は深く落とします。下の切り替えで雰囲気差を確認できます。</p>
+          <div class="controls">
+            <div>
+              <strong>天気</strong>
+              <div class="toggle-group" data-control="weather">
+                <button class="toggle-pill is-active" data-value="sunny" type="button">晴れ</button>
+                <button class="toggle-pill" data-value="cloudy" type="button">くもり</button>
+                <button class="toggle-pill" data-value="rainy" type="button">雨</button>
+              </div>
+            </div>
+            <div>
+              <strong>時間帯</strong>
+              <div class="toggle-group" data-control="time">
+                <button class="toggle-pill" data-value="morning" type="button">朝</button>
+                <button class="toggle-pill is-active" data-value="day" type="button">昼</button>
+                <button class="toggle-pill" data-value="night" type="button">夜</button>
+              </div>
+            </div>
+          </div>
+          <p class="controls-status" id="controls-status">現在: 晴れ / 昼</p>
+        </article>
+
+        <article class="note-card">
+          <h2>similar day の2状態</h2>
+          <div class="component-demo">
+            <section class="section">
+              <p class="section__eyebrow">PHOTO FIRST</p>
+              <div class="similar">
+                <div class="similar__photo"></div>
+                <div class="similar__info">
+                  <div>
+                    <p class="similar__date">2026 / 06 / 12</p>
+                    <h4 class="similar__headline">26° / 18° 晴れ</h4>
+                    <p class="similar__detail">写真あり。服装の実感をすぐ伝える。</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="section">
+              <p class="section__eyebrow">TEXT FALLBACK</p>
+              <div class="similar similar--fallback">
+                <div class="similar__info">
+                  <div>
+                    <p class="similar__date">2026 / 05 / 22</p>
+                    <h4 class="similar__headline">20° / 16° くもり</h4>
+                    <p class="similar__detail">写真なし。テキストカードとして同じ面を維持する。</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </article>
+
+        <article class="note-card">
+          <h2>この次にやること</h2>
+          <p>この見た目で問題なければ、次はここから本物のアプリへ戻します。順番は `Today の実装`、`similar day の写真有無ロジック`、`Record 画面のチップUI` です。</p>
+        </article>
+      </div>
+    </section>
+  </div>
+  </main>
+  <script>
+    (function () {
+      const hero = document.getElementById('today-hero');
+      const pageSkin = document.getElementById('page-skin');
+      const status = document.getElementById('controls-status');
+      if (!hero || !status || !pageSkin) return;
+
+      const state = {
+        weather: 'sunny',
+        time: 'day'
+      };
+
+      const weatherLabels = {
+        sunny: '晴れ',
+        cloudy: 'くもり',
+        rainy: '雨'
+      };
+
+      const timeLabels = {
+        morning: '朝',
+        day: '昼',
+        night: '夜'
+      };
+
+      function renderHeroState() {
+        hero.classList.remove(
+          'is-sunny', 'is-cloudy', 'is-rainy',
+          'is-morning', 'is-day', 'is-night'
+        );
+        pageSkin.classList.remove(
+          'is-sunny', 'is-cloudy', 'is-rainy',
+          'is-morning', 'is-day', 'is-night'
+        );
+        hero.classList.add('is-' + state.weather, 'is-' + state.time);
+        pageSkin.classList.add('is-' + state.weather, 'is-' + state.time);
+        status.textContent = '現在: ' + weatherLabels[state.weather] + ' / ' + timeLabels[state.time];
+      }
+
+      document.querySelectorAll('.toggle-group').forEach((group) => {
+        const kind = group.dataset.control;
+        group.querySelectorAll('.toggle-pill').forEach((button) => {
+          button.addEventListener('click', () => {
+            group.querySelectorAll('.toggle-pill').forEach((pill) => {
+              pill.classList.remove('is-active');
+            });
+            button.classList.add('is-active');
+            state[kind] = button.dataset.value;
+            renderHeroState();
+          });
+        });
+      });
+
+      renderHeroState();
+    }());
+  </script>
+</body>
+</html>
