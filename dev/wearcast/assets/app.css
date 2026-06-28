@@ -22,6 +22,7 @@ html,
 body {
   margin: 0;
   min-height: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -101,6 +102,7 @@ body.theme-rainy.time-night {
 
 .chrome {
   max-width: 1240px;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -110,6 +112,11 @@ body.theme-rainy.time-night {
   align-items: end;
   gap: 18px;
   margin-bottom: 16px;
+  max-width: 100%;
+}
+
+.masthead > div {
+  min-width: 0;
 }
 
 .masthead__eyebrow,
@@ -134,6 +141,7 @@ body.theme-rainy.time-night {
   font-size: 42px;
   line-height: 1.02;
   max-width: 720px;
+  overflow-wrap: anywhere;
 }
 
 .masthead__meta {
@@ -153,6 +161,7 @@ body.theme-rainy.time-night {
   margin-bottom: 22px;
   overflow-x: auto;
   padding-bottom: 4px;
+  max-width: 100%;
   scrollbar-width: none;
 }
 
@@ -202,11 +211,14 @@ body.theme-rainy.time-night {
   display: grid;
   grid-template-columns: minmax(320px, 450px) minmax(320px, 1fr);
   gap: 24px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .stack {
   display: grid;
   gap: 18px;
+  min-width: 0;
 }
 
 .hero-card,
@@ -217,6 +229,7 @@ body.theme-rainy.time-night {
   border: 1px solid rgba(255, 255, 255, 0.82);
   box-shadow: var(--shadow);
   backdrop-filter: blur(16px);
+  min-width: 0;
 }
 
 .hero-card {
@@ -270,6 +283,17 @@ body.theme-rainy.time-night .hero-card {
   background: rgba(255, 255, 255, 0.08);
 }
 
+.hero-card__eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
+  text-shadow: 0 1px 8px rgba(12, 32, 52, 0.2);
+}
+
 .hero-card__title {
   margin: 0;
   font-size: 44px;
@@ -278,9 +302,13 @@ body.theme-rainy.time-night .hero-card {
 
 .hero-card__summary {
   margin: 10px 0 0;
-  max-width: 360px;
-  line-height: 1.7;
+  max-width: none;
+  line-height: 1.65;
   color: rgba(255, 255, 255, 0.82);
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 
 .hero-card__meta {
@@ -289,6 +317,32 @@ body.theme-rainy.time-night .hero-card {
   align-items: end;
   gap: 16px;
   margin-top: 28px;
+}
+
+.hero-temp {
+  min-width: 0;
+}
+
+.hero-temp__label {
+  margin: 0 0 4px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.hero-temp__current {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 0.92;
+}
+
+.hero-temp__range {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .temp-display {
@@ -315,8 +369,10 @@ body.theme-rainy.time-night .hero-card {
 }
 
 .hero-card__date {
-  margin: 4px 0 0;
-  font-size: 13px;
+  margin: 0 0 8px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .panel-row {
@@ -358,6 +414,11 @@ body.theme-rainy.time-night .hero-card {
   color: var(--ink-soft);
 }
 
+.mini-panel__sub {
+  font-size: 16px;
+  font-weight: 700;
+}
+
 .section-card,
 .record-card,
 .panel-card {
@@ -377,11 +438,12 @@ body.theme-rainy.time-night .hero-card {
 }
 
 .rain-note__main {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 18px;
   margin-top: 8px;
+  min-width: 0;
 }
 
 .rain-note__caption {
@@ -404,14 +466,28 @@ body.theme-rainy.time-night .hero-card {
   position: relative;
   display: inline-grid;
   place-items: center;
-  width: 58px;
-  height: 58px;
+  width: 54px;
+  height: 54px;
   color: #1f629d;
   opacity: 1;
+  justify-self: end;
 }
 
 .rain-note__icon.is-muted {
   opacity: 0.32;
+}
+
+.rain-note__icon--folded,
+.rain-note__icon--folded-crossed {
+  transform: rotate(0deg);
+}
+
+.rain-note__icon--folded {
+  opacity: 0.72;
+}
+
+.rain-note__icon--folded-crossed {
+  opacity: 0.42;
 }
 
 .rain-note__icon.is-crossed::after {
@@ -420,15 +496,15 @@ body.theme-rainy.time-night .hero-card {
   width: 70px;
   height: 5px;
   border-radius: 999px;
-  background: currentColor;
+  background: #555;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.72);
   transform: rotate(-42deg);
 }
 
-.rain-note__icon svg {
-  width: 54px;
-  height: 54px;
+.rain-note__icon img {
+  width: 50px;
+  height: 50px;
   display: block;
-  fill: currentColor;
 }
 
 .rain-note__risk {
@@ -545,6 +621,33 @@ body.theme-rainy.time-night .hero-card {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+}
+
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.mini-panel__value--text {
+  font-size: 22px;
+  line-height: 1.45;
+}
+
+.similar-hint {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  color: var(--ink-soft);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.similar-hint strong {
+  color: var(--ink);
 }
 
 .form-grid {
@@ -758,6 +861,7 @@ body.time-night .masthead__meta,
 body.time-night .nav-tab,
 body.time-night .page-title,
 body.time-night .section-card__title,
+body.time-night .record-card__headline,
 body.time-night .panel-card p,
 body.time-night .muted,
 body.time-night .section-card__text,
@@ -769,8 +873,51 @@ body.time-night .record-item__meta,
 body.time-night .record-item__detail,
 body.time-night .record-item__headline,
 body.time-night .metric-card__sub,
-body.time-night .mini-panel__sub {
+body.time-night .mini-panel__sub,
+body.time-night .similar-hint {
   color: #edf5ff;
+}
+
+body.time-night {
+  color: #eef6ff;
+}
+
+body.time-night .masthead__eyebrow,
+body.time-night .eyebrow,
+body.time-night .metric-card__label,
+body.time-night .mini-panel__label,
+body.time-night .section-card__eyebrow,
+body.time-night .record-item__meta,
+body.time-night .field-label,
+body.time-night .location-card__eyebrow {
+  color: rgba(226, 239, 252, 0.72);
+}
+
+body.time-night .metric-card__value,
+body.time-night .mini-panel__value,
+body.time-night .record-card__headline,
+body.time-night .similar-card__headline,
+body.time-night .similar-hint strong,
+body.time-night .rain-note__percent {
+  color: #f7fbff;
+}
+
+body.time-night .rain-note__caption,
+body.time-night .rain-note__risk,
+body.time-night .similar-card__detail,
+body.time-night .section-card__text,
+body.time-night .muted,
+body.time-night .metric-card__sub,
+body.time-night .mini-panel__sub {
+  color: rgba(226, 239, 252, 0.8);
+}
+
+body.time-night .rain-note__icon {
+  color: #58b3ff;
+}
+
+body.time-night .rain-note__icon.is-muted {
+  opacity: 0.42;
 }
 
 body.time-night .masthead__meta,
@@ -789,9 +936,19 @@ body.time-night .field input,
 body.time-night .field select,
 body.time-night .field textarea,
 body.time-night .chip-choice__ui,
-body.time-night .similar-card__body {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(231, 240, 250, 0.14);
+body.time-night .similar-card__body,
+body.time-night .similar-hint {
+  background: rgba(242, 248, 255, 0.11);
+  border-color: rgba(231, 240, 250, 0.22);
+}
+
+body.time-night .hero-card {
+  border-color: rgba(231, 240, 250, 0.48);
+}
+
+body.time-night .button--ghost {
+  color: #f7fbff;
+  background: rgba(242, 248, 255, 0.12);
 }
 
 body.time-night .field input,
@@ -814,15 +971,57 @@ body.time-night .field textarea {
 
 @media (max-width: 720px) {
   .app-shell {
-    padding: 18px 12px 32px;
+    padding: 18px 36px 32px 12px;
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .chrome,
+  .page-grid,
+  .stack {
+    width: 100%;
+    max-width: calc(100vw - 72px);
   }
 
   .masthead__title {
-    font-size: 34px;
+    width: min(100%, 360px);
+    font-size: 29px;
+    line-height: 1.06;
+    word-break: break-all;
+  }
+
+  .nav-tabs {
+    gap: 8px;
+  }
+
+  .nav-tab {
+    min-height: 40px;
+    padding: 0 14px;
+    font-size: 15px;
   }
 
   .hero-card__title {
     font-size: 38px;
+  }
+
+  .hero-card {
+    padding: 24px;
+  }
+
+  .hero-card__meta {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .hero-card__location {
+    align-self: stretch;
+    max-width: 220px;
+    text-align: left;
+  }
+
+  .temp-display {
+    font-size: 40px;
   }
 
   .masthead {
@@ -831,6 +1030,7 @@ body.time-night .field textarea {
   }
 
   .meta-grid,
+  .weather-grid,
   .choice-grid,
   .panel-row,
   .similar-card {

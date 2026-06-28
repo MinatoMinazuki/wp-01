@@ -284,6 +284,117 @@ function wc_fetch_json_cached(string $url, string $cacheKey, int $ttlSeconds = 1
     return is_array($decoded) ? $decoded : null;
 }
 
+function wc_fetch_text_cached(string $url, string $cacheKey, int $ttlSeconds = 300): ?string
+{
+    $cacheDir = wc_storage_path('cache');
+    if (!is_dir($cacheDir)) {
+        @mkdir($cacheDir, 0775, true);
+    }
+
+    $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $cacheKey . '.txt';
+    if (is_file($cacheFile) && (time() - filemtime($cacheFile) < $ttlSeconds)) {
+        return (string) file_get_contents($cacheFile);
+    }
+
+    $body = null;
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_USERAGENT => 'Wearcast/1.0',
+        ]);
+        $body = curl_exec($ch);
+        curl_close($ch);
+    } else {
+        $context = stream_context_create([
+            'http' => [
+                'timeout' => 10,
+                'header' => "User-Agent: Wearcast/1.0\r\n",
+            ],
+        ]);
+        $body = @file_get_contents($url, false, $context);
+    }
+
+    if (!is_string($body) || trim($body) === '') {
+        return is_file($cacheFile) ? (string) file_get_contents($cacheFile) : null;
+    }
+
+    file_put_contents($cacheFile, $body);
+    return $body;
+}
+
+function wc_degrees_from_jma_coord(mixed $coord): ?float
+{
+    if (is_array($coord) && isset($coord[0], $coord[1])) {
+        return (float) $coord[0] + ((float) $coord[1] / 60.0);
+    }
+    if (is_numeric($coord)) {
+        return (float) $coord;
+    }
+    return null;
+}
+
+function wc_amedas_map_timestamp(string $latestTime): ?string
+{
+    try {
+        $date = new DateTimeImmutable(trim($latestTime));
+        return $date->setTimezone(new DateTimeZone('Asia/Tokyo'))->format('YmdHi00');
+    } catch (Throwable) {
+        return null;
+    }
+}
+
+function wc_current_temperature(array $location): ?float
+{
+    $lat = isset($location['lat']) && is_numeric($location['lat']) ? (float) $location['lat'] : null;
+    $lng = isset($location['lng']) && is_numeric($location['lng']) ? (float) $location['lng'] : null;
+    if ($lat === null || $lng === null) {
+        return null;
+    }
+
+    $latestTime = wc_fetch_text_cached('https://www.jma.go.jp/bosai/amedas/data/latest_time.txt', 'amedas_latest_time', 300);
+    $timestamp = $latestTime ? wc_amedas_map_timestamp($latestTime) : null;
+    if ($timestamp === null) {
+        return null;
+    }
+
+    $map = wc_fetch_json_cached(
+        'https://www.jma.go.jp/bosai/amedas/data/map/' . rawurlencode($timestamp) . '.json',
+        'amedas_map_' . $timestamp,
+        300
+    );
+    $stations = wc_fetch_json_cached('https://www.jma.go.jp/bosai/amedas/const/amedastable.json', 'amedas_table', 86400);
+    if (!$map || !$stations) {
+        return null;
+    }
+
+    $nearestTemp = null;
+    $nearestDistance = PHP_FLOAT_MAX;
+    foreach ($stations as $code => $station) {
+        $temp = $map[$code]['temp'][0] ?? null;
+        if (!is_numeric($temp)) {
+            continue;
+        }
+
+        $stationLat = wc_degrees_from_jma_coord($station['lat'] ?? null);
+        $stationLng = wc_degrees_from_jma_coord($station['lon'] ?? null);
+        if ($stationLat === null || $stationLng === null) {
+            continue;
+        }
+
+        $distance = (($stationLat - $lat) ** 2) + ((($stationLng - $lng) * cos(deg2rad($lat))) ** 2);
+        if ($distance < $nearestDistance) {
+            $nearestDistance = $distance;
+            $nearestTemp = (float) $temp;
+        }
+    }
+
+    return $nearestTemp;
+}
+
 function wc_office_options(): array
 {
     $data = wc_fetch_json_cached('https://www.jma.go.jp/bosai/common/const/area.json', 'areas', 86400);
@@ -450,6 +561,7 @@ function wc_today_forecast(array $location): array
         'weather_code' => $weatherCode,
         'weather_label' => $weatherText,
         'weather_group' => $weatherGroup,
+        'temp_current' => wc_current_temperature($location),
         'temp_min' => min($tempMin, $tempMax),
         'temp_max' => max($tempMin, $tempMax),
         'precip' => $precip,
@@ -465,6 +577,7 @@ function wc_demo_forecast(array $location): array
         'weather_code' => '101',
         'weather_label' => wc_to_utf8('晴れ 時々 くもり'),
         'weather_group' => 'sunny',
+        'temp_current' => null,
         'temp_min' => 19.0,
         'temp_max' => 27.0,
         'precip' => 20,

@@ -1,8 +1,11 @@
 $(function () {
+  const PHOTO_PLACEHOLDER = '\u753b\u50cf\u3092\u9078\u3076\u3068\u3053\u3053\u306b\u8868\u793a\u3055\u308c\u307e\u3059\u3002';
+  const AREA_PLACEHOLDER = '\u5730\u57df\u3092\u9078\u629e';
+
   function previewImage(input, preview) {
     const file = input.files && input.files[0];
     if (!file) {
-      preview.empty().text('画像を選ぶとここに表示されます');
+      preview.empty().text(PHOTO_PLACEHOLDER);
       return;
     }
 
@@ -41,12 +44,12 @@ $(function () {
     $prefecture.val($selectedOption.text());
 
     if (!officeCode) {
-      $area.html('<option value="">地域を選択</option>');
+      $area.html('<option value="">' + AREA_PLACEHOLDER + '</option>');
       return;
     }
 
     $.getJSON(window.WEARCAST.baseUrl + '/api/areas.php', { office: officeCode }).done(function (response) {
-      const options = ['<option value="">地域を選択</option>'];
+      const options = ['<option value="">' + AREA_PLACEHOLDER + '</option>'];
       $.each(response.areas || [], function (_, area) {
         const selected = presetArea && presetArea === area.code ? ' selected' : '';
         options.push('<option value="' + area.code + '"' + selected + '>' + area.name + '</option>');

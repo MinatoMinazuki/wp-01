@@ -36,10 +36,10 @@ function wc_render_shell_start(array $app, string $activeNav): void
     <nav class="nav-tabs" aria-label="Primary">
       <?php
       $items = [
-          'today' => ['label' => 'Today', 'href' => wc_url('index.php')],
-          'record' => ['label' => 'Record', 'href' => wc_url('record.php')],
-          'history' => ['label' => 'History', 'href' => wc_url('history.php')],
-          'settings' => ['label' => 'Settings', 'href' => wc_url('settings.php')],
+          'today' => ['label' => '今日', 'href' => wc_url('index.php')],
+          'record' => ['label' => '記録', 'href' => wc_url('record.php')],
+          'history' => ['label' => '履歴', 'href' => wc_url('history.php')],
+          'settings' => ['label' => '設定', 'href' => wc_url('settings.php')],
       ];
       foreach ($items as $key => $item): ?>
         <a class="nav-tab<?= $activeNav === $key ? ' is-active' : '' ?>" href="<?= wc_h($item['href']) ?>"><?= wc_h($item['label']) ?></a>
