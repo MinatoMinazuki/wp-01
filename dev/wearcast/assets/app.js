@@ -4,9 +4,17 @@ $(function () {
 
   function previewImage(input, preview) {
     const file = input.files && input.files[0];
+    const fileNameTarget = input.dataset.fileName ? $(input.dataset.fileName) : $();
     if (!file) {
       preview.empty().text(PHOTO_PLACEHOLDER);
+      if (fileNameTarget.length) {
+        fileNameTarget.text('\u672a\u9078\u629e');
+      }
       return;
+    }
+
+    if (fileNameTarget.length) {
+      fileNameTarget.text(file.name);
     }
 
     const reader = new FileReader();
@@ -21,18 +29,6 @@ $(function () {
     if (preview.length) {
       previewImage(this, preview);
     }
-  });
-
-  $('[data-current-location]').on('click', function () {
-    const wrap = $(this).closest('[data-location-card]');
-    if (!navigator.geolocation || !wrap.length) {
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(function (position) {
-      wrap.find('input[name$="[lat]"]').val(position.coords.latitude.toFixed(6));
-      wrap.find('input[name$="[lng]"]').val(position.coords.longitude.toFixed(6));
-    });
   });
 
   function loadAreas($office, presetArea) {
@@ -54,13 +50,15 @@ $(function () {
         const selected = presetArea && presetArea === area.code ? ' selected' : '';
         options.push('<option value="' + area.code + '"' + selected + '>' + area.name + '</option>');
       });
+      $area.data('loading-area', true);
       $area.html(options.join(''));
       $area.trigger('change');
+      $area.removeData('loading-area');
     });
   }
 
   $('[data-office-select]').each(function () {
-    const presetArea = $(this).data('selected-area') || '';
+    const presetArea = $(this).attr('data-selected-area') || '';
     loadAreas($(this), presetArea);
   });
 
@@ -70,6 +68,44 @@ $(function () {
 
   $(document).on('change', '[data-area-select]', function () {
     const $option = $(this).find('option:selected');
-    $(this).closest('[data-location-card]').find('[data-region-name]').val($option.text());
+    const $card = $(this).closest('[data-location-card]');
+    $card.find('[data-region-name]').val($option.val() ? $option.text() : '');
+  });
+
+  $('[data-wear-select]').each(function () {
+    const $select = $(this);
+    const $button = $select.find('[data-wear-select-button]');
+    const $label = $select.find('[data-wear-select-label]');
+    const $sub = $select.find('[data-wear-select-sub]');
+
+    function syncSelected() {
+      const $checked = $select.find('input[type="radio"]:checked');
+      const $ui = $checked.closest('.wear-option').find('.wear-option__ui');
+      $label.text($ui.find('.wear-option__label').text());
+      $sub.text($ui.find('.wear-option__sub').text());
+    }
+
+    syncSelected();
+
+    $button.on('click', function () {
+      const isOpen = $select.toggleClass('is-open').hasClass('is-open');
+      $button.attr('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    $select.on('change', 'input[type="radio"]', function () {
+      syncSelected();
+      $select.removeClass('is-open');
+      $button.attr('aria-expanded', 'false');
+    });
+  });
+
+  $(document).on('click', function (event) {
+    const $target = $(event.target);
+    $('[data-wear-select].is-open').each(function () {
+      const $select = $(this);
+      if (!$target.closest($select).length) {
+        $select.removeClass('is-open').find('[data-wear-select-button]').attr('aria-expanded', 'false');
+      }
+    });
   });
 });

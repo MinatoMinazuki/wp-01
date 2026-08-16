@@ -41,6 +41,11 @@ $weatherSummary = match ((string) $forecast['weather_group']) {
 $umbrellaState = $rainPercent >= 50 ? 'open' : ($rainPercent >= 30 ? 'folded' : 'folded-crossed');
 $umbrellaClass = ' rain-note__icon--' . $umbrellaState . ($umbrellaState === 'folded-crossed' ? ' is-crossed' : '');
 $umbrellaIcon = $umbrellaState === 'open' ? 'icon-umbrella-open.png' : 'icon-umbrella-folded.png';
+$umbrellaLabel = match ($umbrellaState) {
+    'open' => '傘が必要',
+    'folded' => '折りたたみ傘があると安心',
+    default => '傘は不要',
+};
 $rainRiskNote = '';
 if ((string) $forecast['weather_group'] === 'rainy' && $rainPercent >= 50) {
     foreach (['午後', '昼過ぎ', '夕方', '夜', '雷', '激しく', '強い'] as $riskWord) {
@@ -63,8 +68,8 @@ wc_render_shell_start($app, 'today');
         <div class="hero-card__meta">
           <div class="hero-temp">
             <p class="hero-temp__label"><?= wc_h('現在') ?></p>
-            <div class="hero-temp__current"><?= wc_h($currentTempLabel) ?>°</div>
-            <p class="hero-temp__range"><?= wc_h('最高') ?> <?= wc_h((string) $tempMax) ?>° / <?= wc_h('最低') ?> <?= wc_h((string) $tempMin) ?>°</p>
+            <div class="hero-temp__current"><?= wc_h($currentTempLabel) ?>℃</div>
+            <p class="hero-temp__range"><?= wc_h('最高') ?> <?= wc_h((string) $tempMax) ?>℃ / <?= wc_h('最低') ?> <?= wc_h((string) $tempMin) ?>℃</p>
             <p class="hero-card__weather"><?= wc_h($weatherSummary) ?></p>
           </div>
           <div class="hero-card__location">
@@ -92,9 +97,12 @@ wc_render_shell_start($app, 'today');
               <p class="rain-note__caption"><?= wc_h('降水確率') ?></p>
               <p class="rain-note__percent"><?= wc_h((string) $rainPercent) ?>%</p>
             </div>
-            <span class="rain-note__icon<?= wc_h($umbrellaClass) ?>" aria-label="<?= wc_h('umbrella state') ?>">
-              <img src="<?= wc_h(wc_url('assets/' . $umbrellaIcon)) ?>" alt="" aria-hidden="true">
-            </span>
+            <p class="rain-note__decision-label"><?= wc_h($umbrellaLabel) ?></p>
+            <div class="rain-note__decision">
+              <span class="rain-note__icon<?= wc_h($umbrellaClass) ?>" aria-hidden="true">
+                <img src="<?= wc_h(wc_url('assets/' . $umbrellaIcon)) ?>" alt="">
+              </span>
+            </div>
           </div>
           <?php if ($rainRiskNote !== ''): ?>
             <p class="rain-note__risk"><?= wc_h($rainRiskNote) ?></p>
@@ -133,7 +141,7 @@ wc_render_shell_start($app, 'today');
       <?php if ($hasRecords): ?>
         <section class="section-card">
           <p class="section-card__eyebrow">SIMILAR DAY</p>
-          <h2 class="section-card__title"><?= wc_h('似た日の記録') ?></h2>
+          <h2 class="section-card__title"><?= wc_h('気温が近い日の記録') ?></h2>
           <?php if ($similar): ?>
             <?php
             $similarDate = date('Y.m.d', strtotime((string) $similar['record_date']));
@@ -149,7 +157,7 @@ wc_render_shell_start($app, 'today');
                   <p class="record-item__meta"><?= wc_h($similarDate) ?></p>
                   <h3 class="similar-card__headline"><?= wc_h($similar['outfit_category']) ?></h3>
                   <p class="similar-card__detail">
-                    <?= wc_h('最高') ?> <?= wc_h((string) $similarMax) ?>° / <?= wc_h('最低') ?> <?= wc_h((string) $similarMin) ?>°
+                    <?= wc_h('最高') ?> <?= wc_h((string) $similarMax) ?>℃ / <?= wc_h('最低') ?> <?= wc_h((string) $similarMin) ?>℃
                     <br><?= wc_h($similar['weather_label']) ?>
                     <?php if (!empty($similar['comment_text'])): ?><br><?= wc_h('メモ') ?>: <?= wc_h($similar['comment_text']) ?><?php endif; ?>
                   </p>
@@ -160,7 +168,7 @@ wc_render_shell_start($app, 'today');
         </section>
       <?php else: ?>
         <aside class="similar-hint">
-          <strong><?= wc_h('似た日の記録') ?></strong>
+          <strong><?= wc_h('気温が近い日の記録') ?></strong>
           <span><?= wc_h('記録が増えると、近い気温の日の服装をここに表示します。') ?></span>
         </aside>
       <?php endif; ?>
@@ -179,8 +187,8 @@ wc_render_shell_start($app, 'today');
           </div>
           <div class="mini-panel">
             <p class="mini-panel__label"><?= wc_h('気温') ?></p>
-            <p class="mini-panel__value"><?= wc_h('現在') ?> <?= wc_h($currentTempLabel) ?>°</p>
-            <p class="mini-panel__sub"><?= wc_h('最高') ?> <?= wc_h((string) $tempMax) ?>° / <?= wc_h('最低') ?> <?= wc_h((string) $tempMin) ?>°</p>
+            <p class="mini-panel__value"><?= wc_h('現在') ?> <?= wc_h($currentTempLabel) ?>℃</p>
+            <p class="mini-panel__sub"><?= wc_h('最高') ?> <?= wc_h((string) $tempMax) ?>℃ / <?= wc_h('最低') ?> <?= wc_h((string) $tempMin) ?>℃</p>
           </div>
           <div class="mini-panel">
             <p class="mini-panel__label"><?= wc_h('更新') ?></p>

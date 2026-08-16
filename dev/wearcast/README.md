@@ -14,4 +14,4 @@ Notes:
 
 - app pages are plain PHP + jQuery, no router
 - weather data is fetched from JMA JSON and cached in `storage/cache`
-- if `config.php` is missing, the app falls back to session mode
+- `config.php` and MySQL connection are required; the app does not fall back to session mode

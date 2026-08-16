@@ -40,17 +40,21 @@ function wc_load_config(): array
 {
     $configPath = wc_root_path('config.php');
     if (!is_file($configPath)) {
-        return [];
+        throw new RuntimeException('Wearcast config.php is missing.');
     }
 
     $config = require $configPath;
-    return is_array($config) ? $config : [];
+    if (!is_array($config)) {
+        throw new RuntimeException('Wearcast config.php must return an array.');
+    }
+
+    return $config;
 }
 
-function wc_connect_db(array $db): ?PDO
+function wc_connect_db(array $db): PDO
 {
     if (empty($db['dsn']) || (!isset($db['user']) && !array_key_exists('user', $db))) {
-        return null;
+        throw new RuntimeException('Wearcast database configuration is incomplete.');
     }
 
     try {
@@ -61,10 +65,11 @@ function wc_connect_db(array $db): ?PDO
             [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
             ]
         );
-    } catch (Throwable) {
-        return null;
+    } catch (Throwable $exception) {
+        throw new RuntimeException('Wearcast database connection failed.', 0, $exception);
     }
 }
 

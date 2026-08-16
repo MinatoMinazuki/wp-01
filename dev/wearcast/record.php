@@ -7,6 +7,8 @@ $forecast = wc_today_forecast($app['activeLocation']);
 $recommendation = wc_outfit_recommendation((float) $forecast['temp_max'], (float) $forecast['temp_min'], (string) $forecast['weather_group']);
 $GLOBALS['wearcast_theme'] = $forecast['weather_group'];
 $GLOBALS['wearcast_time'] = wc_time_period();
+$heroTitle = wc_to_utf8((string) $recommendation['label']);
+$heroTitleHtml = str_replace(' + ', ' +<br>', wc_h($heroTitle));
 
 $outfits = [
     ['value' => '半袖', 'sub' => '真夏寄りの軽さを優先'],
@@ -23,12 +25,12 @@ wc_render_shell_start($app, 'record');
   <section class="page-grid">
     <div class="stack">
       <section class="hero-card">
-        <p class="eyebrow">RECORD TODAY</p>
-        <h2 class="hero-card__title"><?= wc_h($recommendation['label']) ?></h2>
-        <p class="hero-card__summary">記録は similar day の材料になります。画像がある日は次回の提案にもそのまま写真を出します。</p>
+        <p class="eyebrow hero-card__eyebrow">RECORD TODAY</p>
+        <h2 class="hero-card__title hero-card__title--record"><?= $heroTitleHtml ?></h2>
+        <p class="hero-card__summary">記録は次回の提案材料になります。写真がある日は似た日の表示にも使います。</p>
         <div class="hero-card__meta">
           <div>
-            <div class="temp-display"><?= wc_h((string) (int) round((float) $forecast['temp_max'])) ?>°</div>
+            <div class="temp-display"><?= wc_h((string) (int) round((float) $forecast['temp_max'])) ?>℃</div>
             <p class="hero-card__weather"><?= wc_h($forecast['weather_label']) ?></p>
           </div>
           <div class="hero-card__location">
@@ -40,9 +42,11 @@ wc_render_shell_start($app, 'record');
     </div>
 
     <section class="record-card">
-      <p class="section-card__eyebrow">TODAY LOG</p>
-      <h2 class="page-title">今日の服装を残す</h2>
-      <form class="form-grid" action="<?= wc_h(wc_url('actions/save_record.php')) ?>" method="post" enctype="multipart/form-data" style="margin-top: 18px;">
+      <div class="record-card__head">
+        <p class="section-card__eyebrow">TODAY LOG</p>
+        <h2 class="page-title">今日の服装を残す</h2>
+      </div>
+      <form class="form-grid" action="<?= wc_h(wc_url('actions/save_record.php')) ?>" method="post" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="<?= wc_h(wc_csrf_token()) ?>">
         <input type="hidden" name="record_date" value="<?= wc_h(date('Y-m-d')) ?>">
         <input type="hidden" name="location_id" value="<?= wc_h((string) ($app['activeLocation']['id'] ?? '')) ?>">
@@ -54,16 +58,25 @@ wc_render_shell_start($app, 'record');
 
         <div class="field">
           <p class="field-label">服装カテゴリ</p>
-          <div class="choice-grid">
+          <div class="wear-select" data-wear-select>
+            <button class="wear-select__button" type="button" aria-expanded="false" data-wear-select-button>
+              <span>
+                <strong data-wear-select-label><?= wc_h($recommendation['label']) ?></strong>
+                <small data-wear-select-sub><?= wc_h($recommendation['detail']) ?></small>
+              </span>
+              <span class="wear-select__chevron" aria-hidden="true"></span>
+            </button>
+            <div class="wear-select__list" data-wear-select-list>
             <?php foreach ($outfits as $outfit): ?>
-              <label class="choice-card">
+              <label class="wear-option">
                 <input type="radio" name="outfit_category" value="<?= wc_h($outfit['value']) ?>" <?= $outfit['value'] === $recommendation['label'] ? 'checked' : '' ?> required>
-                <span class="choice-card__ui">
-                  <span class="choice-card__label"><?= wc_h($outfit['value']) ?></span>
-                  <span class="choice-card__sub"><?= wc_h($outfit['sub']) ?></span>
+                <span class="wear-option__ui">
+                  <span class="wear-option__label"><?= wc_h($outfit['value']) ?></span>
+                  <span class="wear-option__sub"><?= wc_h($outfit['sub']) ?></span>
                 </span>
               </label>
             <?php endforeach; ?>
+            </div>
           </div>
         </div>
 
@@ -97,9 +110,13 @@ wc_render_shell_start($app, 'record');
         </div>
 
         <div class="photo-drop">
-          <label class="field">
+          <label class="field photo-field">
             <span class="field-label">写真 1枚まで / 最大 2MB</span>
-            <input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp" data-photo-input data-preview="#photo-preview">
+            <input class="photo-input" type="file" name="photo" accept=".jpg,.jpeg,.png,.webp" data-photo-input data-preview="#photo-preview" data-file-name="#photo-file-name">
+            <span class="photo-picker">
+              <span class="photo-picker__button">写真を選ぶ</span>
+              <span class="photo-picker__name" id="photo-file-name">未選択</span>
+            </span>
           </label>
           <div class="photo-preview" id="photo-preview">画像を選ぶとここに表示されます</div>
         </div>
